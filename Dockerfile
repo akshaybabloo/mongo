@@ -6,7 +6,7 @@ ENV MONGO_INITDB_ROOT_USERNAME="root"
 ENV MONGO_INITDB_ROOT_PASSWORD="root"
 
 RUN apt-get update && \
-    apt-get install -y wget && \
+    apt-get install -y wget build-essential && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
