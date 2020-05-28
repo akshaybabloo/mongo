@@ -1,0 +1,16 @@
+name: Mongo Test
+
+on: [push]
+
+jobs:
+
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - name: Pull and run MongoDB
+        run: |
+          docker pull mongo
+          docker run mongo

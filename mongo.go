@@ -1,0 +1,113 @@
+package mongo
+
+import (
+	"context"
+	"time"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+)
+
+// MongoDb implements MongoDb's CRUD operations
+type MongoDb interface {
+	Add(collectionName string, data interface{}) (*mongo.InsertOneResult, error)
+	Update(collectionName string, id string, data interface{}) (*mongo.UpdateResult, error)
+	Delete(collectionName string, id string) (*mongo.DeleteResult, error)
+	Get(collectionName string, id string) *mongo.SingleResult
+	Collection(collectionName string) *mongo.Collection
+	DB() *mongo.Database
+	client() (*mongo.Client, context.Context)
+}
+
+// NewMongoDbClient takes in the
+type NewMongoDbClient struct {
+	// The connection URL to connect to MongoDB atlas or local deployment
+	ConnectionUrl string
+
+	// The database name
+	DatabaseName string
+}
+
+// Add can be used to add document to MongoDB
+func (connectionDetails NewMongoDbClient) Add(collectionName string, data interface{}) (*mongo.InsertOneResult, error) {
+	client, ctx := connectionDetails.client()
+	defer client.Disconnect(ctx)
+	db := client.Database(connectionDetails.DatabaseName)
+
+	collection := db.Collection(collectionName)
+	insertResult, err := collection.InsertOne(ctx, data)
+	if err != nil {
+		return nil, err
+	}
+	return insertResult, nil
+}
+
+// Update can be used to update values by it's ID
+func (connectionDetails NewMongoDbClient) Update(collectionName string, id string, data interface{}) (*mongo.UpdateResult, error) {
+	client, ctx := connectionDetails.client()
+	defer client.Disconnect(ctx)
+	db := client.Database(connectionDetails.DatabaseName)
+
+	collection := db.Collection(collectionName)
+	updateResult, err := collection.UpdateOne(ctx, bson.M{"id": id}, bson.D{{"$set", data}})
+	if err != nil {
+		return nil, err
+	}
+	return updateResult, nil
+}
+
+// Delete deletes a document by ID only.
+func (connectionDetails NewMongoDbClient) Delete(collectionName string, id string) (*mongo.DeleteResult, error) {
+	client, ctx := connectionDetails.client()
+	defer client.Disconnect(ctx)
+	db := client.Database(connectionDetails.DatabaseName)
+
+	collection := db.Collection(collectionName)
+	insertResult, err := collection.DeleteOne(ctx, bson.M{"id": id})
+	if err != nil {
+		return nil, err
+	}
+	return insertResult, nil
+}
+
+// Get finds one document
+func (connectionDetails NewMongoDbClient) Get(collectionName string, id string) *mongo.SingleResult {
+	client, ctx := connectionDetails.client()
+	defer client.Disconnect(ctx)
+	db := client.Database(connectionDetails.DatabaseName)
+
+	collection := db.Collection(collectionName)
+	findOne := collection.FindOne(ctx, bson.M{"id": id})
+
+	return findOne
+}
+
+// Collection returns mongo.Collection
+func (connectionDetails NewMongoDbClient) Collection(collectionName string) *mongo.Collection {
+	client, ctx := connectionDetails.client()
+	defer client.Disconnect(ctx)
+	db := client.Database(connectionDetails.DatabaseName)
+
+	collection := db.Collection(collectionName)
+	return collection
+}
+
+// DB returns mongo.Database
+func (connectionDetails NewMongoDbClient) DB() *mongo.Database {
+	client, ctx := connectionDetails.client()
+	defer client.Disconnect(ctx)
+	db := client.Database(connectionDetails.DatabaseName)
+
+	return db
+}
+
+func (connectionDetails NewMongoDbClient) client() (*mongo.Client, context.Context) {
+	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(connectionDetails.ConnectionUrl))
+	if err != nil {
+		panic(err)
+	}
+
+	return client, ctx
+}
