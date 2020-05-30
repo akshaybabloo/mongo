@@ -1,4 +1,4 @@
-FROM mongo
+FROM ubuntu
 
 ARG go_version=1.14.3
 ENV PATH="/usr/local/go/bin:$PATH"
