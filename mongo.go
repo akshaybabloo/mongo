@@ -12,9 +12,9 @@ import (
 // MongoDb implements MongoDb's CRUD operations
 type MongoDb interface {
 	Add(collectionName string, data interface{}) (*mongo.InsertOneResult, error)
-	Update(collectionName string, id string, data interface{}) (*mongo.UpdateResult, error)
-	Delete(collectionName string, id string) (*mongo.DeleteResult, error)
-	Get(collectionName string, id string) *mongo.SingleResult
+	Update(collectionName string, id int, data interface{}) (*mongo.UpdateResult, error)
+	Delete(collectionName string, id int) (*mongo.DeleteResult, error)
+	Get(collectionName string, id int) *mongo.SingleResult
 	Collection(collectionName string) *mongo.Collection
 	DB() *mongo.Database
 	client() (*mongo.Client, context.Context)
@@ -44,7 +44,7 @@ func (connectionDetails NewMongoDbClient) Add(collectionName string, data interf
 }
 
 // Update can be used to update values by it's ID
-func (connectionDetails NewMongoDbClient) Update(collectionName string, id string, data interface{}) (*mongo.UpdateResult, error) {
+func (connectionDetails NewMongoDbClient) Update(collectionName string, id int, data interface{}) (*mongo.UpdateResult, error) {
 	client, ctx := connectionDetails.client()
 	defer client.Disconnect(ctx)
 	db := client.Database(connectionDetails.DatabaseName)
@@ -58,7 +58,7 @@ func (connectionDetails NewMongoDbClient) Update(collectionName string, id strin
 }
 
 // Delete deletes a document by ID only.
-func (connectionDetails NewMongoDbClient) Delete(collectionName string, id string) (*mongo.DeleteResult, error) {
+func (connectionDetails NewMongoDbClient) Delete(collectionName string, id int) (*mongo.DeleteResult, error) {
 	client, ctx := connectionDetails.client()
 	defer client.Disconnect(ctx)
 	db := client.Database(connectionDetails.DatabaseName)
@@ -71,8 +71,8 @@ func (connectionDetails NewMongoDbClient) Delete(collectionName string, id strin
 	return insertResult, nil
 }
 
-// Get finds one document
-func (connectionDetails NewMongoDbClient) Get(collectionName string, id string) *mongo.SingleResult {
+// Get finds one document based on "id" and not "_id"
+func (connectionDetails NewMongoDbClient) Get(collectionName string, id int) *mongo.SingleResult {
 	client, ctx := connectionDetails.client()
 	defer client.Disconnect(ctx)
 	db := client.Database(connectionDetails.DatabaseName)
