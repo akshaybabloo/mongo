@@ -3,4 +3,4 @@
 mkdir -p /data/db
 mongod --fork -f /etc/mongod.conf
 
-go test -v
+go test -v -race -coverprofile=coverage.txt -covermode=atomic
