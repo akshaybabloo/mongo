@@ -1,3 +1,5 @@
+// +build example_test
+
 package mongo_test
 
 import (
@@ -88,5 +90,5 @@ func ExampleNewMongoDbClient_Get() {
 	}
 	fmt.Println(decodeData)
 	// Output:
-	// { Id: 1 Name: Akshay }
+	// { 2 Akshay }
 }
