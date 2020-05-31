@@ -1,9 +1,8 @@
-// +build example_test
-
 package mongo_test
 
 import (
 	"fmt"
+
 	"github.com/akshaybabloo/mongo"
 )
 
@@ -29,8 +28,6 @@ func ExampleNewMongoDbClient_Add() {
 		panic(err)
 	}
 	fmt.Println("The ID is:", done.InsertedID)
-	// Output:
-	// The ID is: ObjectId("1234565adfsdfsf")
 }
 
 func ExampleNewMongoDbClient_Delete() {
@@ -44,8 +41,6 @@ func ExampleNewMongoDbClient_Delete() {
 		panic(err)
 	}
 	fmt.Println("Deleted items:", deleted.DeletedCount)
-	// Output:
-	// Deleted items: 1
 }
 
 func ExampleNewMongoDbClient_Update() {
@@ -67,8 +62,6 @@ func ExampleNewMongoDbClient_Update() {
 		panic(err)
 	}
 	fmt.Println("Modified items:", updated.ModifiedCount)
-	// Output:
-	// Modified items: 1
 }
 
 func ExampleNewMongoDbClient_Get() {
@@ -89,6 +82,4 @@ func ExampleNewMongoDbClient_Get() {
 		panic("No data found.")
 	}
 	fmt.Println(decodeData)
-	// Output:
-	// { 2 Akshay }
 }
