@@ -1,6 +1,6 @@
 # Mongo
 
-![Mongo Test](https://github.com/akshaybabloo/mongo/workflows/Mongo%20Test/badge.svg)
+[![Mongo Test](https://github.com/akshaybabloo/mongo/workflows/Mongo%20Test/badge.svg)](https://github.com/akshaybabloo/mongo/actions)
 
 A simple wrapper for Go's Mongo Driver
 
