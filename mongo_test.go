@@ -5,7 +5,7 @@ import "testing"
 var client NewMongoDbClient
 
 type data struct {
-	Id   int    `bson:"id"`
+	Id   string    `bson:"id"`
 	Name string `bson:"name"`
 }
 
@@ -18,7 +18,7 @@ func init() {
 
 func TestNewMongoDbClient_Add(t *testing.T) {
 	testData := data{
-		Id:   1,
+		Id:   "1",
 		Name: "Akshay",
 	}
 
@@ -31,7 +31,7 @@ func TestNewMongoDbClient_Add(t *testing.T) {
 
 func TestNewMongoDbClient_Get(t *testing.T) {
 	testData := data{
-		Id:   2,
+		Id:   "2",
 		Name: "Akshay",
 	}
 
@@ -43,7 +43,7 @@ func TestNewMongoDbClient_Get(t *testing.T) {
 
 	// Actual test
 	var decodeData data
-	data := client.Get("test_collection", 2).Decode(&decodeData)
+	data := client.Get("test_collection", "2").Decode(&decodeData)
 	t.Logf("%v", decodeData)
 	if data != nil {
 		t.Errorf("No data found.")
@@ -52,7 +52,7 @@ func TestNewMongoDbClient_Get(t *testing.T) {
 
 func TestNewMongoDbClient_Update(t *testing.T) {
 	testData := data{
-		Id:   3,
+		Id:   "3",
 		Name: "Akshay",
 	}
 
@@ -67,7 +67,7 @@ func TestNewMongoDbClient_Update(t *testing.T) {
 		Name: "Gollahalli",
 	}
 
-	update, err := client.Update("test_collection", 3, data)
+	update, err := client.Update("test_collection", "3", data)
 	if err != nil {
 		t.Errorf("Unable to update data. %s", err)
 	}
@@ -76,7 +76,7 @@ func TestNewMongoDbClient_Update(t *testing.T) {
 
 func TestNewMongoDbClient_Delete(t *testing.T) {
 	testData := data{
-		Id:   4,
+		Id:   "4",
 		Name: "Akshay",
 	}
 
@@ -87,7 +87,7 @@ func TestNewMongoDbClient_Delete(t *testing.T) {
 	t.Logf("The ID is %s", done.InsertedID)
 
 	// Actual test
-	deleted, err := client.Delete("test_collection", 4)
+	deleted, err := client.Delete("test_collection", "4")
 	if err != nil {
 		t.Errorf("Unable to delete data. %s", err)
 	}

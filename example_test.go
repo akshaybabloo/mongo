@@ -9,7 +9,7 @@ import (
 func ExampleNewMongoDbClient_Add() {
 
 	type data struct {
-		Id   int    `bson:"id"`
+		Id   string    `bson:"id"`
 		Name string `bson:"name"`
 	}
 
@@ -19,7 +19,7 @@ func ExampleNewMongoDbClient_Add() {
 	}
 
 	testData := data{
-		Id:   1,
+		Id:   "1",
 		Name: "Akshay",
 	}
 
@@ -36,7 +36,7 @@ func ExampleNewMongoDbClient_Delete() {
 		DatabaseName:  "test",
 	}
 
-	deleted, err := client.Delete("test_collection", 1)
+	deleted, err := client.Delete("test_collection", "1")
 	if err != nil {
 		panic(err)
 	}
@@ -57,7 +57,7 @@ func ExampleNewMongoDbClient_Update() {
 		Name: "Akshay",
 	}
 
-	updated, err := client.Update("test_collection", 1, testData)
+	updated, err := client.Update("test_collection", "1", testData)
 	if err != nil {
 		panic(err)
 	}
@@ -77,7 +77,7 @@ func ExampleNewMongoDbClient_Get() {
 	}
 
 	var decodeData data
-	output := client.Get("test_collection", 2).Decode(&decodeData)
+	output := client.Get("test_collection", "2").Decode(&decodeData)
 	if output != nil {
 		panic("No data found.")
 	}
