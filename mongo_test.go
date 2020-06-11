@@ -95,7 +95,8 @@ func TestNewMongoDbClient_Delete(t *testing.T) {
 }
 
 func TestNewMongoDbClient_Collection(t *testing.T) {
-	collection := client.Collection("test_collection")
+	collection, client, ctx := client.Collection("test_collection")
+	defer client.Disconnect(ctx)
 	if collection.Name() != "test_collection" {
 		t.Errorf("Collection name incorrect")
 	}
