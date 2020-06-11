@@ -50,7 +50,7 @@ type MongoDb interface {
 	Update(collectionName string, id string, data interface{}) (*mongo.UpdateResult, error)
 	Delete(collectionName string, id string) (*mongo.DeleteResult, error)
 	Get(collectionName string, id string) *mongo.SingleResult
-	Collection(collectionName string) *mongo.Collection
+	Collection(collectionName string) (*mongo.Collection, *mongo.Client, context.Context)
 	DB() *mongo.Database
 	client() (*mongo.Client, context.Context)
 }
@@ -119,13 +119,14 @@ func (connectionDetails NewMongoDbClient) Get(collectionName string, id string) 
 }
 
 // Collection returns mongo.Collection
-func (connectionDetails NewMongoDbClient) Collection(collectionName string) *mongo.Collection {
+//
+// Note: Do not forget to do - defer client.Disconnect(ctx)
+func (connectionDetails NewMongoDbClient) Collection(collectionName string) (*mongo.Collection, *mongo.Client, context.Context) {
 	client, ctx := connectionDetails.client()
-	defer client.Disconnect(ctx)
 	db := client.Database(connectionDetails.DatabaseName)
 
 	collection := db.Collection(collectionName)
-	return collection
+	return collection, client, ctx
 }
 
 // DB returns mongo.Database
