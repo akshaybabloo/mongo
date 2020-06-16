@@ -51,7 +51,9 @@ type MongoDb interface {
 	Update(collectionName string, id string, data interface{}) (*mongo.UpdateResult, error)
 	Delete(collectionName string, id string) (*mongo.DeleteResult, error)
 	Get(collectionName string, id string) *mongo.SingleResult
+	GetCustom(collectionName string, id string) *mongo.SingleResult
 	GetAll(collectionName string, id string, result interface{}) error
+	GetAllCustom(collectionName string, id string, result interface{}) error
 	Collection(collectionName string) (*mongo.Collection, *mongo.Client, context.Context)
 	DB() *mongo.Database
 	client() (*mongo.Client, context.Context)
@@ -134,6 +136,18 @@ func (connectionDetails NewMongoDbClient) Get(collectionName string, id string) 
 	return findOne
 }
 
+// Get finds one document by a filter - bson.M{}, bson.A{}, or bson.D{}
+func (connectionDetails NewMongoDbClient) GetCustom(collectionName string, filter interface{}) *mongo.SingleResult {
+	client, ctx := connectionDetails.client()
+	defer client.Disconnect(ctx)
+	db := client.Database(connectionDetails.DatabaseName)
+
+	collection := db.Collection(collectionName)
+	findOne := collection.FindOne(ctx, filter)
+
+	return findOne
+}
+
 // GetAll finds all documents by "id" and not "_id".
 //
 //The 'result' parameter needs to be a pointer.
@@ -144,6 +158,27 @@ func (connectionDetails NewMongoDbClient) GetAll(collectionName string, id strin
 
 	collection := db.Collection(collectionName)
 	find, err := collection.Find(ctx, bson.M{"id": id})
+	if err != nil {
+		return err
+	}
+
+	if err = find.All(ctx, result); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// GetAll finds all documents by filter - bson.M{}, bson.A{}, or bson.D{}.
+//
+//The 'result' parameter needs to be a pointer.
+func (connectionDetails NewMongoDbClient) GetAllCustom(collectionName string, filter interface{}, result interface{}) error {
+	client, ctx := connectionDetails.client()
+	defer client.Disconnect(ctx)
+	db := client.Database(connectionDetails.DatabaseName)
+
+	collection := db.Collection(collectionName)
+	find, err := collection.Find(ctx, filter)
 	if err != nil {
 		return err
 	}

@@ -3,6 +3,8 @@ package mongo_test
 import (
 	"fmt"
 
+	"go.mongodb.org/mongo-driver/bson"
+
 	"github.com/akshaybabloo/mongo"
 )
 
@@ -114,6 +116,26 @@ func ExampleNewMongoDbClient_Get() {
 	fmt.Println(decodeData)
 }
 
+func ExampleNewMongoDbClient_GetCustom() {
+
+	type data struct {
+		Id   int    `bson:"id"`
+		Name string `bson:"name"`
+	}
+
+	client := mongo.NewMongoDbClient{
+		ConnectionUrl: "mongodb://localhost:27017/?retryWrites=true&w=majority",
+		DatabaseName:  "test",
+	}
+
+	var decodeData data
+	output := client.GetCustom("test_collection", bson.M{"id": "2"}).Decode(&decodeData)
+	if output != nil {
+		panic("No data found.")
+	}
+	fmt.Println(decodeData)
+}
+
 func ExampleNewMongoDbClient_GetAll() {
 
 	type data struct {
@@ -128,6 +150,26 @@ func ExampleNewMongoDbClient_GetAll() {
 
 	var testData []data
 	err := client.GetAll("test_collection", "1", &data{})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("The ID is:", testData)
+}
+
+func ExampleNewMongoDbClient_GetAllCustom() {
+
+	type data struct {
+		Id   string `bson:"id"`
+		Name string `bson:"name"`
+	}
+
+	client := mongo.NewMongoDbClient{
+		ConnectionUrl: "mongodb://localhost:27017/?retryWrites=true&w=majority",
+		DatabaseName:  "test",
+	}
+
+	var testData []data
+	err := client.GetAllCustom("test_collection", bson.M{"id": "1"}, &data{})
 	if err != nil {
 		panic(err)
 	}

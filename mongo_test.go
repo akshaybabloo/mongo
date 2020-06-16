@@ -2,6 +2,8 @@ package mongo
 
 import (
 	"testing"
+
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 var client NewMongoDbClient
@@ -71,6 +73,27 @@ func TestNewMongoDbClient_Get(t *testing.T) {
 	}
 }
 
+func TestNewMongoDbClient_GetCustom(t *testing.T) {
+	testData := data{
+		Id:   "2",
+		Name: "Akshay",
+	}
+
+	done, err := client.Add("test_collection", testData)
+	if err != nil {
+		t.Errorf("Unable to add data. %s", err)
+	}
+	t.Logf("The ID is %s", done.InsertedID)
+
+	// Actual test
+	var decodeData data
+	data := client.GetCustom("test_collection", bson.M{"id": "2"}).Decode(&decodeData)
+	t.Logf("%v", decodeData)
+	if data != nil {
+		t.Errorf("No data found.")
+	}
+}
+
 func TestNewMongoDbClient_GetAll(t *testing.T) {
 	testData := data{
 		Id:   "123",
@@ -86,6 +109,27 @@ func TestNewMongoDbClient_GetAll(t *testing.T) {
 	// Actual test
 	var result []data
 	err = client.GetAll("test_collection", "1", &result)
+	if err != nil {
+		t.Errorf("No data found.")
+	}
+	t.Logf("%v", result)
+}
+
+func TestNewMongoDbClient_GetAllCustom(t *testing.T) {
+	testData := data{
+		Id:   "123",
+		Name: "Akshay",
+	}
+
+	_, err := client.Add("test_collection", testData)
+	if err != nil {
+		t.Errorf("Unable to add data. %s", err)
+	}
+	//t.Logf("The ID is %s", done.InsertedID)
+
+	// Actual test
+	var result []data
+	err = client.GetAllCustom("test_collection", bson.M{"id": "1"}, &result)
 	if err != nil {
 		t.Errorf("No data found.")
 	}
