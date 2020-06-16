@@ -47,9 +47,11 @@ import (
 // MongoDb implements MongoDb's CRUD operations
 type MongoDb interface {
 	Add(collectionName string, data interface{}) (*mongo.InsertOneResult, error)
+	AddMany(collectionName string, data []interface{}) (*mongo.InsertManyResult, error)
 	Update(collectionName string, id string, data interface{}) (*mongo.UpdateResult, error)
 	Delete(collectionName string, id string) (*mongo.DeleteResult, error)
 	Get(collectionName string, id string) *mongo.SingleResult
+	GetAll(collectionName string, id string, result interface{}) error
 	Collection(collectionName string) (*mongo.Collection, *mongo.Client, context.Context)
 	DB() *mongo.Database
 	client() (*mongo.Client, context.Context)
@@ -72,6 +74,20 @@ func (connectionDetails NewMongoDbClient) Add(collectionName string, data interf
 
 	collection := db.Collection(collectionName)
 	insertResult, err := collection.InsertOne(ctx, data)
+	if err != nil {
+		return nil, err
+	}
+	return insertResult, nil
+}
+
+// AddMany can be used to add multiple documents to MongoDB
+func (connectionDetails NewMongoDbClient) AddMany(collectionName string, data []interface{}) (*mongo.InsertManyResult, error) {
+	client, ctx := connectionDetails.client()
+	defer client.Disconnect(ctx)
+	db := client.Database(connectionDetails.DatabaseName)
+
+	collection := db.Collection(collectionName)
+	insertResult, err := collection.InsertMany(ctx, data)
 	if err != nil {
 		return nil, err
 	}
@@ -116,6 +132,27 @@ func (connectionDetails NewMongoDbClient) Get(collectionName string, id string) 
 	findOne := collection.FindOne(ctx, bson.M{"id": id})
 
 	return findOne
+}
+
+// GetAll finds all documents by "id" and not "_id".
+//
+//The 'result' parameter needs to be a pointer.
+func (connectionDetails NewMongoDbClient) GetAll(collectionName string, id string, result interface{}) error {
+	client, ctx := connectionDetails.client()
+	defer client.Disconnect(ctx)
+	db := client.Database(connectionDetails.DatabaseName)
+
+	collection := db.Collection(collectionName)
+	find, err := collection.Find(ctx, bson.M{"id": id})
+	if err != nil {
+		return err
+	}
+
+	if err = find.All(ctx, result); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // Collection returns mongo.Collection

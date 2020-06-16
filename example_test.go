@@ -9,7 +9,7 @@ import (
 func ExampleNewMongoDbClient_Add() {
 
 	type data struct {
-		Id   string    `bson:"id"`
+		Id   string `bson:"id"`
 		Name string `bson:"name"`
 	}
 
@@ -28,6 +28,36 @@ func ExampleNewMongoDbClient_Add() {
 		panic(err)
 	}
 	fmt.Println("The ID is:", done.InsertedID)
+}
+
+func ExampleNewMongoDbClient_AddMany() {
+
+	type data struct {
+		Id   string `bson:"id"`
+		Name string `bson:"name"`
+	}
+
+	client := mongo.NewMongoDbClient{
+		ConnectionUrl: "mongodb://localhost:27017/?retryWrites=true&w=majority",
+		DatabaseName:  "test",
+	}
+
+	var testData = []interface{}{
+		data{
+			Id:   "1",
+			Name: "Akshay",
+		},
+		data{
+			Id:   "2",
+			Name: "Raj",
+		},
+	}
+
+	done, err := client.AddMany("test_collection", testData)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("The ID is:", done.InsertedIDs)
 }
 
 func ExampleNewMongoDbClient_Delete() {
@@ -82,4 +112,24 @@ func ExampleNewMongoDbClient_Get() {
 		panic("No data found.")
 	}
 	fmt.Println(decodeData)
+}
+
+func ExampleNewMongoDbClient_GetAll() {
+
+	type data struct {
+		Id   string `bson:"id"`
+		Name string `bson:"name"`
+	}
+
+	client := mongo.NewMongoDbClient{
+		ConnectionUrl: "mongodb://localhost:27017/?retryWrites=true&w=majority",
+		DatabaseName:  "test",
+	}
+
+	var testData []data
+	err := client.GetAll("test_collection", "1", &data{})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("The ID is:", testData)
 }

@@ -1,11 +1,13 @@
 package mongo
 
-import "testing"
+import (
+	"testing"
+)
 
 var client NewMongoDbClient
 
 type data struct {
-	Id   string    `bson:"id"`
+	Id   string `bson:"id"`
 	Name string `bson:"name"`
 }
 
@@ -29,6 +31,25 @@ func TestNewMongoDbClient_Add(t *testing.T) {
 	t.Logf("The ID is %s", done.InsertedID)
 }
 
+func TestNewMongoDbClient_AddMany(t *testing.T) {
+	var testData = []interface{}{
+		data{
+			Id:   "111",
+			Name: "Akshay",
+		},
+		data{
+			Id:   "222",
+			Name: "Raj",
+		},
+	}
+
+	done, err := client.AddMany("test_collection", testData)
+	if err != nil {
+		t.Errorf("Unable to add data. %s", err)
+	}
+	t.Logf("The ID is %s", done.InsertedIDs)
+}
+
 func TestNewMongoDbClient_Get(t *testing.T) {
 	testData := data{
 		Id:   "2",
@@ -48,6 +69,27 @@ func TestNewMongoDbClient_Get(t *testing.T) {
 	if data != nil {
 		t.Errorf("No data found.")
 	}
+}
+
+func TestNewMongoDbClient_GetAll(t *testing.T) {
+	testData := data{
+		Id:   "123",
+		Name: "Akshay",
+	}
+
+	_, err := client.Add("test_collection", testData)
+	if err != nil {
+		t.Errorf("Unable to add data. %s", err)
+	}
+	//t.Logf("The ID is %s", done.InsertedID)
+
+	// Actual test
+	var result []data
+	err = client.GetAll("test_collection", "1", &result)
+	if err != nil {
+		t.Errorf("No data found.")
+	}
+	t.Logf("%v", result)
 }
 
 func TestNewMongoDbClient_Update(t *testing.T) {
