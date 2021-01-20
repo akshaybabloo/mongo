@@ -1,6 +1,6 @@
 FROM mongo:4-bionic
 
-ARG go_version=1.15.6
+ARG go_version=1.15.7
 ENV PATH="/usr/local/go/bin:$PATH"
 
 ARG DEBIAN_FRONTEND=noninteractive
