@@ -1,38 +1,37 @@
-/*
-mongo is a simple wrapper for MongoDb Driver, this package uses "id" instead of "_id" to find or add a document.
-
-It is important to know that you will have to index id field for optimum performance.
-
-In general you would't need this package at all, if you rely more on "id" and simple access to MongoDB API then this module will help you.
-
-Example:
-
-	import "github.com/akshaybabloo/mongo"
-
-	type data struct {
-		Id   int    `bson:"id"`
-		Name string `bson:"name"`
-	}
-
-	func main() {
-		client := mongo.NewMongoDbClient{
-			ConnectionUrl: "mongodb://localhost:27017/?retryWrites=true&w=majority",
-			DatabaseName:  "test",
-		}
-
-		testData := data{
-			Id:   1,
-			Name: "Akshay",
-		}
-
-		done, err := client.Add("test_collection", testData)
-		if err != nil {
-			panic(err)
-		}
-		print(done.InsertedID)
-	}
-
-*/
+// Package mongo is a simple wrapper for MongoDb Driver, this package uses "id" instead of "_id" to find or add a document.
+//
+// It is important to know that you will have to index id field for optimum performance.
+//
+// In general you would't need this package at all, if you rely more on "id" and simple access to MongoDB API then this module will help you.
+//
+// Example:
+//
+// 	import "github.com/akshaybabloo/mongo"
+//
+// 	type data struct {
+// 		Id   int    `bson:"id"`
+// 		Name string `bson:"name"`
+// 	}
+//
+// 	func main() {
+// 		client := mongo.NewMongoDbClient{
+// 			ConnectionUrl: "mongodb://localhost:27017/?retryWrites=true&w=majority",
+// 			DatabaseName:  "test",
+// 		}
+//
+// 		testData := data{
+// 			Id:   1,
+// 			Name: "Akshay",
+// 		}
+//
+// 		done, err := client.Add("test_collection", testData)
+// 		if err != nil {
+// 			panic(err)
+// 		}
+// 		print(done.InsertedID)
+// 	}
+//
+//
 package mongo
 
 import (
