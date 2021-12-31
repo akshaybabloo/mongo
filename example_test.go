@@ -15,7 +15,7 @@ func ExampleNewMongoDbClient_Add() {
 		Name string `bson:"name"`
 	}
 
-	client := mongo.MongoClient{
+	client := mongo.Client{
 		ConnectionUrl: "mongodb://localhost:27017/?retryWrites=true&w=majority",
 		DatabaseName:  "test",
 	}
@@ -39,7 +39,7 @@ func ExampleNewMongoDbClient_AddMany() {
 		Name string `bson:"name"`
 	}
 
-	client := mongo.MongoClient{
+	client := mongo.Client{
 		ConnectionUrl: "mongodb://localhost:27017/?retryWrites=true&w=majority",
 		DatabaseName:  "test",
 	}
@@ -63,7 +63,7 @@ func ExampleNewMongoDbClient_AddMany() {
 }
 
 func ExampleNewMongoDbClient_Delete() {
-	client := mongo.MongoClient{
+	client := mongo.Client{
 		ConnectionUrl: "mongodb://localhost:27017/?retryWrites=true&w=majority",
 		DatabaseName:  "test",
 	}
@@ -80,7 +80,7 @@ func ExampleNewMongoDbClient_Update() {
 		Name string `bson:"name"`
 	}
 
-	client := mongo.MongoClient{
+	client := mongo.Client{
 		ConnectionUrl: "mongodb://localhost:27017/?retryWrites=true&w=majority",
 		DatabaseName:  "test",
 	}
@@ -103,7 +103,7 @@ func ExampleNewMongoDbClient_Get() {
 		Name string `bson:"name"`
 	}
 
-	client := mongo.MongoClient{
+	client := mongo.Client{
 		ConnectionUrl: "mongodb://localhost:27017/?retryWrites=true&w=majority",
 		DatabaseName:  "test",
 	}
@@ -123,7 +123,7 @@ func ExampleNewMongoDbClient_GetCustom() {
 		Name string `bson:"name"`
 	}
 
-	client := mongo.MongoClient{
+	client := mongo.Client{
 		ConnectionUrl: "mongodb://localhost:27017/?retryWrites=true&w=majority",
 		DatabaseName:  "test",
 	}
@@ -143,7 +143,7 @@ func ExampleNewMongoDbClient_GetAll() {
 		Name string `bson:"name"`
 	}
 
-	client := mongo.MongoClient{
+	client := mongo.Client{
 		ConnectionUrl: "mongodb://localhost:27017/?retryWrites=true&w=majority",
 		DatabaseName:  "test",
 	}
@@ -163,7 +163,7 @@ func ExampleNewMongoDbClient_GetAllCustom() {
 		Name string `bson:"name"`
 	}
 
-	client := mongo.MongoClient{
+	client := mongo.Client{
 		ConnectionUrl: "mongodb://localhost:27017/?retryWrites=true&w=majority",
 		DatabaseName:  "test",
 	}
