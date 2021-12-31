@@ -9,22 +9,19 @@
 // 	import "github.com/akshaybabloo/mongo"
 //
 // 	type data struct {
-// 		Id   int    `bson:"id"`
+// 		ID   int    `bson:"id"`
 // 		Name string `bson:"name"`
 // 	}
 //
 // 	func main() {
-// 		Client := mongo.Client{
-// 			ConnectionUrl: "mongodb://localhost:27017/?retryWrites=true&w=majority",
-// 			DatabaseName:  "test",
-// 		}
+// 		client := NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test")
 //
 // 		testData := data{
-// 			Id:   1,
+// 			ID:   1,
 // 			Name: "Akshay",
 // 		}
 //
-// 		done, err := Client.Add("test_collection", testData)
+// 		done, err := client.Add("test_collection", testData)
 // 		if err != nil {
 // 			panic(err)
 // 		}
