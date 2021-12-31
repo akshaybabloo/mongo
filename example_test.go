@@ -8,17 +8,14 @@ import (
 	"github.com/akshaybabloo/mongo"
 )
 
-func ExampleNewMongoDbClient_Add() {
+func ExampleClient_Add() {
 
 	type data struct {
 		Id   string `bson:"id"`
 		Name string `bson:"name"`
 	}
 
-	client := mongo.Client{
-		ConnectionUrl: "mongodb://localhost:27017/?retryWrites=true&w=majority",
-		DatabaseName:  "test",
-	}
+	client := mongo.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test")
 
 	testData := data{
 		Id:   "1",
@@ -32,17 +29,14 @@ func ExampleNewMongoDbClient_Add() {
 	fmt.Println("The ID is:", done.InsertedID)
 }
 
-func ExampleNewMongoDbClient_AddMany() {
+func ExampleClient_AddMany() {
 
 	type data struct {
 		Id   string `bson:"id"`
 		Name string `bson:"name"`
 	}
 
-	client := mongo.Client{
-		ConnectionUrl: "mongodb://localhost:27017/?retryWrites=true&w=majority",
-		DatabaseName:  "test",
-	}
+	client := mongo.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test")
 
 	var testData = []interface{}{
 		data{
@@ -62,11 +56,8 @@ func ExampleNewMongoDbClient_AddMany() {
 	fmt.Println("The ID is:", done.InsertedIDs)
 }
 
-func ExampleNewMongoDbClient_Delete() {
-	client := mongo.Client{
-		ConnectionUrl: "mongodb://localhost:27017/?retryWrites=true&w=majority",
-		DatabaseName:  "test",
-	}
+func ExampleClient_Delete() {
+	client := mongo.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test")
 
 	deleted, err := client.Delete("test_collection", "1")
 	if err != nil {
@@ -75,15 +66,12 @@ func ExampleNewMongoDbClient_Delete() {
 	fmt.Println("Deleted items:", deleted.DeletedCount)
 }
 
-func ExampleNewMongoDbClient_Update() {
+func ExampleClient_Update() {
 	type data struct {
 		Name string `bson:"name"`
 	}
 
-	client := mongo.Client{
-		ConnectionUrl: "mongodb://localhost:27017/?retryWrites=true&w=majority",
-		DatabaseName:  "test",
-	}
+	client := mongo.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test")
 
 	testData := data{
 		Name: "Akshay",
@@ -96,17 +84,14 @@ func ExampleNewMongoDbClient_Update() {
 	fmt.Println("Modified items:", updated.ModifiedCount)
 }
 
-func ExampleNewMongoDbClient_Get() {
+func ExampleClient_Get() {
 
 	type data struct {
 		Id   int    `bson:"id"`
 		Name string `bson:"name"`
 	}
 
-	client := mongo.Client{
-		ConnectionUrl: "mongodb://localhost:27017/?retryWrites=true&w=majority",
-		DatabaseName:  "test",
-	}
+	client := mongo.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test")
 
 	var decodeData data
 	output := client.Get("test_collection", "2").Decode(&decodeData)
@@ -116,17 +101,14 @@ func ExampleNewMongoDbClient_Get() {
 	fmt.Println(decodeData)
 }
 
-func ExampleNewMongoDbClient_GetCustom() {
+func ExampleClient_GetCustom() {
 
 	type data struct {
 		Id   int    `bson:"id"`
 		Name string `bson:"name"`
 	}
 
-	client := mongo.Client{
-		ConnectionUrl: "mongodb://localhost:27017/?retryWrites=true&w=majority",
-		DatabaseName:  "test",
-	}
+	client := mongo.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test")
 
 	var decodeData data
 	output := client.GetCustom("test_collection", bson.M{"id": "2"}).Decode(&decodeData)
@@ -136,17 +118,14 @@ func ExampleNewMongoDbClient_GetCustom() {
 	fmt.Println(decodeData)
 }
 
-func ExampleNewMongoDbClient_GetAll() {
+func ExampleClient_GetAll() {
 
 	type data struct {
 		Id   string `bson:"id"`
 		Name string `bson:"name"`
 	}
 
-	client := mongo.Client{
-		ConnectionUrl: "mongodb://localhost:27017/?retryWrites=true&w=majority",
-		DatabaseName:  "test",
-	}
+	client := mongo.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test")
 
 	var testData []data
 	err := client.GetAll("test_collection", "1", &data{})
@@ -156,17 +135,14 @@ func ExampleNewMongoDbClient_GetAll() {
 	fmt.Println("The ID is:", testData)
 }
 
-func ExampleNewMongoDbClient_GetAllCustom() {
+func ExampleClient_GetAllCustom() {
 
 	type data struct {
 		Id   string `bson:"id"`
 		Name string `bson:"name"`
 	}
 
-	client := mongo.Client{
-		ConnectionUrl: "mongodb://localhost:27017/?retryWrites=true&w=majority",
-		DatabaseName:  "test",
-	}
+	client := mongo.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test")
 
 	var testData []data
 	err := client.GetAllCustom("test_collection", bson.M{"id": "1"}, &data{})

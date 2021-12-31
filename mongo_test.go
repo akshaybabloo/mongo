@@ -19,7 +19,7 @@ func init() {
 	client = NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test")
 }
 
-func TestNewMongoDbClient_Add(t *testing.T) {
+func TestClient_Add(t *testing.T) {
 	testData := data{
 		Id:   "1",
 		Name: "Akshay",
@@ -32,7 +32,7 @@ func TestNewMongoDbClient_Add(t *testing.T) {
 	t.Logf("The ID is %s", done.InsertedID)
 }
 
-func TestNewMongoDbClient_AddMany(t *testing.T) {
+func TestClient_AddMany(t *testing.T) {
 	var testData = []interface{}{
 		data{
 			Id:   "111",
@@ -51,7 +51,7 @@ func TestNewMongoDbClient_AddMany(t *testing.T) {
 	t.Logf("The ID is %s", done.InsertedIDs)
 }
 
-func TestNewMongoDbClient_Get(t *testing.T) {
+func TestClient_Get(t *testing.T) {
 	testData := data{
 		Id:   "2",
 		Name: "Akshay",
@@ -72,7 +72,7 @@ func TestNewMongoDbClient_Get(t *testing.T) {
 	}
 }
 
-func TestNewMongoDbClient_GetCustom(t *testing.T) {
+func TestClient_GetCustom(t *testing.T) {
 	testData := data{
 		Id:   "2",
 		Name: "Akshay",
@@ -93,7 +93,7 @@ func TestNewMongoDbClient_GetCustom(t *testing.T) {
 	}
 }
 
-func TestNewMongoDbClient_GetAll(t *testing.T) {
+func TestClient_GetAll(t *testing.T) {
 	testData := data{
 		Id:   "123",
 		Name: "Akshay",
@@ -113,7 +113,7 @@ func TestNewMongoDbClient_GetAll(t *testing.T) {
 	t.Logf("%v", result)
 }
 
-func TestNewMongoDbClient_GetAllCustom(t *testing.T) {
+func TestClient_GetAllCustom(t *testing.T) {
 	testData := data{
 		Id:   "123",
 		Name: "Akshay",
@@ -133,7 +133,7 @@ func TestNewMongoDbClient_GetAllCustom(t *testing.T) {
 	t.Logf("%v", result)
 }
 
-func TestNewMongoDbClient_Update(t *testing.T) {
+func TestClient_Update(t *testing.T) {
 	testData := data{
 		Id:   "3",
 		Name: "Akshay",
@@ -157,7 +157,7 @@ func TestNewMongoDbClient_Update(t *testing.T) {
 	t.Logf("The ID is %d", update.ModifiedCount)
 }
 
-func TestNewMongoDbClient_Delete(t *testing.T) {
+func TestClient_Delete(t *testing.T) {
 	testData := data{
 		Id:   "4",
 		Name: "Akshay",
@@ -177,7 +177,7 @@ func TestNewMongoDbClient_Delete(t *testing.T) {
 	t.Logf("Number deleted %d", deleted.DeletedCount)
 }
 
-func TestNewMongoDbClient_Collection(t *testing.T) {
+func TestClient_Collection(t *testing.T) {
 	collection, client, ctx := client.Collection("test_collection")
 	defer func(client *mongo.Client, ctx context.Context) {
 		err := client.Disconnect(ctx)
@@ -190,7 +190,7 @@ func TestNewMongoDbClient_Collection(t *testing.T) {
 	}
 }
 
-func TestNewMongoDbClient_DB(t *testing.T) {
+func TestClient_DB(t *testing.T) {
 	db := client.DB()
 	if db.Name() != "test" {
 		t.Errorf("Database name incorrect")
