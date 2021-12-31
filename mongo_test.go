@@ -1,9 +1,11 @@
 package mongo
 
 import (
+	"context"
 	"testing"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
 var client NewMongoDbClient
@@ -104,7 +106,6 @@ func TestNewMongoDbClient_GetAll(t *testing.T) {
 	if err != nil {
 		t.Errorf("Unable to add data. %s", err)
 	}
-	//t.Logf("The ID is %s", done.InsertedID)
 
 	// Actual test
 	var result []data
@@ -125,7 +126,6 @@ func TestNewMongoDbClient_GetAllCustom(t *testing.T) {
 	if err != nil {
 		t.Errorf("Unable to add data. %s", err)
 	}
-	//t.Logf("The ID is %s", done.InsertedID)
 
 	// Actual test
 	var result []data
@@ -182,7 +182,12 @@ func TestNewMongoDbClient_Delete(t *testing.T) {
 
 func TestNewMongoDbClient_Collection(t *testing.T) {
 	collection, client, ctx := client.Collection("test_collection")
-	defer client.Disconnect(ctx)
+	defer func(client *mongo.Client, ctx context.Context) {
+		err := client.Disconnect(ctx)
+		if err != nil {
+			return
+		}
+	}(client, ctx)
 	if collection.Name() != "test_collection" {
 		t.Errorf("Collection name incorrect")
 	}
