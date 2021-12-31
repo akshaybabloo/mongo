@@ -5,7 +5,7 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 
-	"github.com/akshaybabloo/mongo"
+	"github.com/akshaybabloo/mongo/v2"
 )
 
 func ExampleClient_Add() {
