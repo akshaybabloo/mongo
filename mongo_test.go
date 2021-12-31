@@ -11,7 +11,7 @@ import (
 var client Client
 
 type data struct {
-	Id   string `bson:"id"`
+	ID   string `bson:"id"`
 	Name string `bson:"name"`
 }
 
@@ -21,7 +21,7 @@ func init() {
 
 func TestClient_Add(t *testing.T) {
 	testData := data{
-		Id:   "1",
+		ID:   "1",
 		Name: "Akshay",
 	}
 
@@ -35,11 +35,11 @@ func TestClient_Add(t *testing.T) {
 func TestClient_AddMany(t *testing.T) {
 	var testData = []interface{}{
 		data{
-			Id:   "111",
+			ID:   "111",
 			Name: "Akshay",
 		},
 		data{
-			Id:   "222",
+			ID:   "222",
 			Name: "Raj",
 		},
 	}
@@ -53,7 +53,7 @@ func TestClient_AddMany(t *testing.T) {
 
 func TestClient_Get(t *testing.T) {
 	testData := data{
-		Id:   "2",
+		ID:   "2",
 		Name: "Akshay",
 	}
 
@@ -74,7 +74,7 @@ func TestClient_Get(t *testing.T) {
 
 func TestClient_GetCustom(t *testing.T) {
 	testData := data{
-		Id:   "2",
+		ID:   "2",
 		Name: "Akshay",
 	}
 
@@ -95,7 +95,7 @@ func TestClient_GetCustom(t *testing.T) {
 
 func TestClient_GetAll(t *testing.T) {
 	testData := data{
-		Id:   "123",
+		ID:   "123",
 		Name: "Akshay",
 	}
 
@@ -115,7 +115,7 @@ func TestClient_GetAll(t *testing.T) {
 
 func TestClient_GetAllCustom(t *testing.T) {
 	testData := data{
-		Id:   "123",
+		ID:   "123",
 		Name: "Akshay",
 	}
 
@@ -135,7 +135,7 @@ func TestClient_GetAllCustom(t *testing.T) {
 
 func TestClient_Update(t *testing.T) {
 	testData := data{
-		Id:   "3",
+		ID:   "3",
 		Name: "Akshay",
 	}
 
@@ -159,7 +159,7 @@ func TestClient_Update(t *testing.T) {
 
 func TestClient_Delete(t *testing.T) {
 	testData := data{
-		Id:   "4",
+		ID:   "4",
 		Name: "Akshay",
 	}
 

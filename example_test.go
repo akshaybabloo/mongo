@@ -11,14 +11,14 @@ import (
 func ExampleClient_Add() {
 
 	type data struct {
-		Id   string `bson:"id"`
+		ID   string `bson:"id"`
 		Name string `bson:"name"`
 	}
 
 	client := mongo.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test")
 
 	testData := data{
-		Id:   "1",
+		ID:   "1",
 		Name: "Akshay",
 	}
 
@@ -32,7 +32,7 @@ func ExampleClient_Add() {
 func ExampleClient_AddMany() {
 
 	type data struct {
-		Id   string `bson:"id"`
+		ID   string `bson:"id"`
 		Name string `bson:"name"`
 	}
 
@@ -40,11 +40,11 @@ func ExampleClient_AddMany() {
 
 	var testData = []interface{}{
 		data{
-			Id:   "1",
+			ID:   "1",
 			Name: "Akshay",
 		},
 		data{
-			Id:   "2",
+			ID:   "2",
 			Name: "Raj",
 		},
 	}
@@ -87,7 +87,7 @@ func ExampleClient_Update() {
 func ExampleClient_Get() {
 
 	type data struct {
-		Id   int    `bson:"id"`
+		ID   int    `bson:"id"`
 		Name string `bson:"name"`
 	}
 
@@ -104,7 +104,7 @@ func ExampleClient_Get() {
 func ExampleClient_GetCustom() {
 
 	type data struct {
-		Id   int    `bson:"id"`
+		ID   int    `bson:"id"`
 		Name string `bson:"name"`
 	}
 
@@ -121,7 +121,7 @@ func ExampleClient_GetCustom() {
 func ExampleClient_GetAll() {
 
 	type data struct {
-		Id   string `bson:"id"`
+		ID   string `bson:"id"`
 		Name string `bson:"name"`
 	}
 
@@ -138,7 +138,7 @@ func ExampleClient_GetAll() {
 func ExampleClient_GetAllCustom() {
 
 	type data struct {
-		Id   string `bson:"id"`
+		ID   string `bson:"id"`
 		Name string `bson:"name"`
 	}
 
