@@ -8,7 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-var client NewMongoDbClient
+var client MongoClient
 
 type data struct {
 	Id   string `bson:"id"`
@@ -16,7 +16,7 @@ type data struct {
 }
 
 func init() {
-	client = NewMongoDbClient{
+	client = MongoClient{
 		ConnectionUrl: "mongodb://localhost:27017/?retryWrites=true&w=majority",
 		DatabaseName:  "test",
 	}

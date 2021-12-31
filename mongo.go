@@ -14,7 +14,7 @@
 // 	}
 //
 // 	func main() {
-// 		client := mongo.NewMongoDbClient{
+// 		client := mongo.MongoClient{
 // 			ConnectionUrl: "mongodb://localhost:27017/?retryWrites=true&w=majority",
 // 			DatabaseName:  "test",
 // 		}
@@ -43,23 +43,8 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// MongoDb implements MongoDb's CRUD operations
-type MongoDb interface {
-	Add(collectionName string, data interface{}) (*mongo.InsertOneResult, error)
-	AddMany(collectionName string, data []interface{}) (*mongo.InsertManyResult, error)
-	Update(collectionName string, id string, data interface{}) (*mongo.UpdateResult, error)
-	Delete(collectionName string, id string) (*mongo.DeleteResult, error)
-	Get(collectionName string, id string) *mongo.SingleResult
-	GetCustom(collectionName string, id string) *mongo.SingleResult
-	GetAll(collectionName string, id string, result interface{}) error
-	GetAllCustom(collectionName string, id string, result interface{}) error
-	Collection(collectionName string) (*mongo.Collection, *mongo.Client, context.Context)
-	DB() *mongo.Database
-	client() (*mongo.Client, context.Context)
-}
-
-// NewMongoDbClient takes in the
-type NewMongoDbClient struct {
+// MongoClient takes in the
+type MongoClient struct {
 	// ConnectionUrl which connects to MongoDB atlas or local deployment
 	ConnectionUrl string
 
@@ -68,7 +53,7 @@ type NewMongoDbClient struct {
 }
 
 // Add can be used to add document to MongoDB
-func (connectionDetails NewMongoDbClient) Add(collectionName string, data interface{}) (*mongo.InsertOneResult, error) {
+func (connectionDetails MongoClient) Add(collectionName string, data interface{}) (*mongo.InsertOneResult, error) {
 	client, ctx := connectionDetails.client()
 	defer func(client *mongo.Client, ctx context.Context) {
 		err := client.Disconnect(ctx)
@@ -87,7 +72,7 @@ func (connectionDetails NewMongoDbClient) Add(collectionName string, data interf
 }
 
 // AddMany can be used to add multiple documents to MongoDB
-func (connectionDetails NewMongoDbClient) AddMany(collectionName string, data []interface{}) (*mongo.InsertManyResult, error) {
+func (connectionDetails MongoClient) AddMany(collectionName string, data []interface{}) (*mongo.InsertManyResult, error) {
 	client, ctx := connectionDetails.client()
 	defer func(client *mongo.Client, ctx context.Context) {
 		err := client.Disconnect(ctx)
@@ -106,7 +91,7 @@ func (connectionDetails NewMongoDbClient) AddMany(collectionName string, data []
 }
 
 // Update can be used to update values by it's ID
-func (connectionDetails NewMongoDbClient) Update(collectionName string, id string, data interface{}) (*mongo.UpdateResult, error) {
+func (connectionDetails MongoClient) Update(collectionName string, id string, data interface{}) (*mongo.UpdateResult, error) {
 	client, ctx := connectionDetails.client()
 	defer func(client *mongo.Client, ctx context.Context) {
 		err := client.Disconnect(ctx)
@@ -125,7 +110,7 @@ func (connectionDetails NewMongoDbClient) Update(collectionName string, id strin
 }
 
 // Delete deletes a document by ID only.
-func (connectionDetails NewMongoDbClient) Delete(collectionName string, id string) (*mongo.DeleteResult, error) {
+func (connectionDetails MongoClient) Delete(collectionName string, id string) (*mongo.DeleteResult, error) {
 	client, ctx := connectionDetails.client()
 	defer func(client *mongo.Client, ctx context.Context) {
 		err := client.Disconnect(ctx)
@@ -144,7 +129,7 @@ func (connectionDetails NewMongoDbClient) Delete(collectionName string, id strin
 }
 
 // Get finds one document based on "id" and not "_id"
-func (connectionDetails NewMongoDbClient) Get(collectionName string, id string) *mongo.SingleResult {
+func (connectionDetails MongoClient) Get(collectionName string, id string) *mongo.SingleResult {
 	client, ctx := connectionDetails.client()
 	defer func(client *mongo.Client, ctx context.Context) {
 		err := client.Disconnect(ctx)
@@ -161,7 +146,7 @@ func (connectionDetails NewMongoDbClient) Get(collectionName string, id string) 
 }
 
 // GetCustom finds one document by a filter - bson.M{}, bson.A{}, or bson.D{}
-func (connectionDetails NewMongoDbClient) GetCustom(collectionName string, filter interface{}) *mongo.SingleResult {
+func (connectionDetails MongoClient) GetCustom(collectionName string, filter interface{}) *mongo.SingleResult {
 	client, ctx := connectionDetails.client()
 	defer func(client *mongo.Client, ctx context.Context) {
 		err := client.Disconnect(ctx)
@@ -180,7 +165,7 @@ func (connectionDetails NewMongoDbClient) GetCustom(collectionName string, filte
 // GetAll finds all documents by "id" and not "_id".
 //
 // The 'result' parameter needs to be a pointer.
-func (connectionDetails NewMongoDbClient) GetAll(collectionName string, id string, result interface{}) error {
+func (connectionDetails MongoClient) GetAll(collectionName string, id string, result interface{}) error {
 	client, ctx := connectionDetails.client()
 	defer func(client *mongo.Client, ctx context.Context) {
 		err := client.Disconnect(ctx)
@@ -206,7 +191,7 @@ func (connectionDetails NewMongoDbClient) GetAll(collectionName string, id strin
 // GetAllCustom finds all documents by filter - bson.M{}, bson.A{}, or bson.D{}.
 //
 // The 'result' parameter needs to be a pointer.
-func (connectionDetails NewMongoDbClient) GetAllCustom(collectionName string, filter interface{}, result interface{}) error {
+func (connectionDetails MongoClient) GetAllCustom(collectionName string, filter interface{}, result interface{}) error {
 	client, ctx := connectionDetails.client()
 	defer func(client *mongo.Client, ctx context.Context) {
 		err := client.Disconnect(ctx)
@@ -232,7 +217,7 @@ func (connectionDetails NewMongoDbClient) GetAllCustom(collectionName string, fi
 // Collection returns mongo.Collection
 //
 // Note: Do not forget to do - defer client.Disconnect(ctx)
-func (connectionDetails NewMongoDbClient) Collection(collectionName string) (*mongo.Collection, *mongo.Client, context.Context) {
+func (connectionDetails MongoClient) Collection(collectionName string) (*mongo.Collection, *mongo.Client, context.Context) {
 	client, ctx := connectionDetails.client()
 	db := client.Database(connectionDetails.DatabaseName)
 
@@ -241,7 +226,7 @@ func (connectionDetails NewMongoDbClient) Collection(collectionName string) (*mo
 }
 
 // DB returns mongo.Database
-func (connectionDetails NewMongoDbClient) DB() *mongo.Database {
+func (connectionDetails MongoClient) DB() *mongo.Database {
 	client, ctx := connectionDetails.client()
 	defer func(client *mongo.Client, ctx context.Context) {
 		err := client.Disconnect(ctx)
@@ -254,7 +239,7 @@ func (connectionDetails NewMongoDbClient) DB() *mongo.Database {
 	return db
 }
 
-func (connectionDetails NewMongoDbClient) client() (*mongo.Client, context.Context) {
+func (connectionDetails MongoClient) client() (*mongo.Client, context.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 	client, err := mongo.Connect(ctx, options.Client().ApplyURI(connectionDetails.ConnectionUrl))
