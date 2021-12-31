@@ -40,6 +40,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
+// NewMongoClient returns Client and it's associated functions
 func NewMongoClient(connectionURL string, databaseName string) Client {
 	return Client{
 		ConnectionUrl: connectionURL,
@@ -94,7 +95,7 @@ func (connectionDetails Client) AddMany(collectionName string, data []interface{
 	return insertResult, nil
 }
 
-// Update can be used to update values by it's ID
+// Update can be used to update values by its ID
 func (connectionDetails Client) Update(collectionName string, id string, data interface{}) (*mongo.UpdateResult, error) {
 	client, ctx := connectionDetails.client()
 	defer func(client *mongo.Client, ctx context.Context) {
