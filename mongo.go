@@ -2,7 +2,7 @@
 //
 // It is important to know that you will have to index id field for optimum performance.
 //
-// In general you would't need this package at all, if you rely more on "id" and simple access to MongoDB API then this module will help you.
+// In general, you wouldn't need this package at all, if you rely more on "id" and simple access to MongoDB API than this module will help you.
 //
 // Example:
 //
