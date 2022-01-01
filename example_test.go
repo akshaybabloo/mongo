@@ -94,8 +94,12 @@ func ExampleClient_Get() {
 	client := mongo.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test")
 
 	var decodeData data
-	output := client.Get("test_collection", "2").Decode(&decodeData)
-	if output != nil {
+	get, err := client.Get("test_collection", "2")
+	if err != nil {
+		panic("Something went wrong")
+	}
+	err = get.Decode(&decodeData)
+	if err != nil {
 		panic("No data found.")
 	}
 	fmt.Println(decodeData)
@@ -111,9 +115,13 @@ func ExampleClient_GetCustom() {
 	client := mongo.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test")
 
 	var decodeData data
-	output := client.GetCustom("test_collection", bson.M{"id": "2"}).Decode(&decodeData)
-	if output != nil {
+	getCustom, err := client.GetCustom("test_collection", bson.M{"id": "2"})
+	if err != nil {
 		panic("No data found.")
+	}
+	err = getCustom.Decode(&decodeData)
+	if err != nil {
+		panic("Something went wrong")
 	}
 	fmt.Println(decodeData)
 }

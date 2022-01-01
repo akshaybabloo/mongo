@@ -65,11 +65,15 @@ func TestClient_Get(t *testing.T) {
 
 	// Actual test
 	var decodeData data
-	data := client.Get("test_collection", "2").Decode(&decodeData)
-	t.Logf("%v", decodeData)
-	if data != nil {
+	data, err := client.Get("test_collection", "2")
+	if err != nil {
+		panic("data not found")
+	}
+	err = data.Decode(&decodeData)
+	if err != nil {
 		t.Errorf("No data found.")
 	}
+	t.Logf("%v", decodeData)
 }
 
 func TestClient_GetCustom(t *testing.T) {
@@ -86,11 +90,16 @@ func TestClient_GetCustom(t *testing.T) {
 
 	// Actual test
 	var decodeData data
-	data := client.GetCustom("test_collection", bson.M{"id": "2"}).Decode(&decodeData)
-	t.Logf("%v", decodeData)
-	if data != nil {
+	data, err := client.GetCustom("test_collection", bson.M{"id": "2"})
+	if err != nil {
 		t.Errorf("No data found.")
 	}
+	err = data.Decode(&decodeData)
+	if err != nil {
+		t.Errorf("No data found.")
+	}
+	t.Logf("%v", decodeData)
+
 }
 
 func TestClient_GetAll(t *testing.T) {
@@ -178,7 +187,10 @@ func TestClient_Delete(t *testing.T) {
 }
 
 func TestClient_Collection(t *testing.T) {
-	collection, client, ctx := client.Collection("test_collection")
+	collection, client, ctx, err := client.Collection("test_collection")
+	if err != nil {
+		t.Errorf("something went wrong. %s", err)
+	}
 	defer func(client *mongo.Client, ctx context.Context) {
 		err := client.Disconnect(ctx)
 		if err != nil {
@@ -191,7 +203,7 @@ func TestClient_Collection(t *testing.T) {
 }
 
 func TestClient_DB(t *testing.T) {
-	db := client.DB()
+	db, _ := client.DB()
 	if db.Name() != "test" {
 		t.Errorf("Database name incorrect")
 	}
