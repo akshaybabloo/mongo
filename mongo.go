@@ -244,6 +244,11 @@ func (connectionDetails *Client) DB() *mongo.Database {
 	return db
 }
 
+// RawClient returns mongo.Client
+func (connectionDetails *Client) RawClient() (*mongo.Client, context.Context) {
+	return connectionDetails.client()
+}
+
 func (connectionDetails *Client) client() (*mongo.Client, context.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
