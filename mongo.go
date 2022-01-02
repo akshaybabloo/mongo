@@ -40,14 +40,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// NewMongoClient returns Client and it's associated functions
-func NewMongoClient(connectionURL string, databaseName string) Client {
-	return Client{
-		ConnectionUrl: connectionURL,
-		DatabaseName:  databaseName,
-	}
-}
-
 // Client takes in the
 type Client struct {
 	// ConnectionUrl which connects to MongoDB atlas or local deployment
@@ -55,6 +47,14 @@ type Client struct {
 
 	// DatabaseName with database name
 	DatabaseName string
+}
+
+// NewMongoClient returns Client and it's associated functions
+func NewMongoClient(connectionURL string, databaseName string) *Client {
+	return &Client{
+		ConnectionUrl: connectionURL,
+		DatabaseName:  databaseName,
+	}
 }
 
 // Add can be used to add document to MongoDB
