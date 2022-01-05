@@ -11,7 +11,7 @@ import (
 func ExampleClient_Add() {
 
 	type data struct {
-		ID   string `bson:"id"`
+		ID   string `bson:"_id"`
 		Name string `bson:"name"`
 	}
 
@@ -32,7 +32,7 @@ func ExampleClient_Add() {
 func ExampleClient_AddMany() {
 
 	type data struct {
-		ID   string `bson:"id"`
+		ID   string `bson:"_id"`
 		Name string `bson:"name"`
 	}
 
@@ -87,7 +87,7 @@ func ExampleClient_Update() {
 func ExampleClient_Get() {
 
 	type data struct {
-		ID   int    `bson:"id"`
+		ID   int    `bson:"_id"`
 		Name string `bson:"name"`
 	}
 
@@ -108,14 +108,14 @@ func ExampleClient_Get() {
 func ExampleClient_GetCustom() {
 
 	type data struct {
-		ID   int    `bson:"id"`
+		ID   int    `bson:"_id"`
 		Name string `bson:"name"`
 	}
 
 	client := mongo.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test")
 
 	var decodeData data
-	getCustom, err := client.GetCustom("test_collection", bson.M{"id": "2"})
+	getCustom, err := client.GetCustom("test_collection", bson.M{"_id": "2"})
 	if err != nil {
 		panic("No data found.")
 	}
@@ -129,7 +129,7 @@ func ExampleClient_GetCustom() {
 func ExampleClient_GetAll() {
 
 	type data struct {
-		ID   string `bson:"id"`
+		ID   string `bson:"_id"`
 		Name string `bson:"name"`
 	}
 
@@ -146,14 +146,14 @@ func ExampleClient_GetAll() {
 func ExampleClient_GetAllCustom() {
 
 	type data struct {
-		ID   string `bson:"id"`
+		ID   string `bson:"_id"`
 		Name string `bson:"name"`
 	}
 
 	client := mongo.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test")
 
 	var testData []data
-	err := client.GetAllCustom("test_collection", bson.M{"id": "1"}, &data{})
+	err := client.GetAllCustom("test_collection", bson.M{"_id": "1"}, &data{})
 	if err != nil {
 		panic(err)
 	}

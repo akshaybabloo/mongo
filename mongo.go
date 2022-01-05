@@ -1,15 +1,15 @@
-// Package mongo is a simple wrapper for MongoDb Driver, this package uses "id" instead of "_id" to find or add a document.
+// Package mongo is a simple wrapper for MongoDb Driver, this package uses "_id" instead of "_id" to find or add a document.
 //
 // It is important to know that you will have to index id field for optimum performance.
 //
-// In general, you wouldn't need this package at all, if you rely more on "id" and simple access to MongoDB API than this module will help you.
+// In general, you wouldn't need this package at all, if you rely more on "_id" and simple access to MongoDB API than this module will help you.
 //
 // Example:
 //
 // 	import "github.com/akshaybabloo/mongo"
 //
 // 	type data struct {
-// 		ID   int    `bson:"id"`
+// 		ID   int    `bson:"_id"`
 // 		Name string `bson:"name"`
 // 	}
 //
@@ -116,7 +116,7 @@ func (connectionDetails *Client) Update(collectionName string, id string, data i
 	db := client.Database(connectionDetails.DatabaseName)
 
 	collection := db.Collection(collectionName)
-	updateResult, err := collection.UpdateOne(ctx, bson.M{"id": id}, bson.D{{"$set", data}})
+	updateResult, err := collection.UpdateOne(ctx, bson.M{"_id": id}, bson.D{{"$set", data}})
 	if err != nil {
 		return nil, err
 	}
@@ -138,14 +138,14 @@ func (connectionDetails *Client) Delete(collectionName string, id string) (*mong
 	db := client.Database(connectionDetails.DatabaseName)
 
 	collection := db.Collection(collectionName)
-	insertResult, err := collection.DeleteOne(ctx, bson.M{"id": id})
+	insertResult, err := collection.DeleteOne(ctx, bson.M{"_id": id})
 	if err != nil {
 		return nil, err
 	}
 	return insertResult, nil
 }
 
-// Get finds one document based on "id" and not "_id"
+// Get finds one document based on "_id"
 func (connectionDetails *Client) Get(collectionName string, id string) (*mongo.SingleResult, error) {
 	client, ctx, err := connectionDetails.client()
 	if err != nil {
@@ -160,7 +160,7 @@ func (connectionDetails *Client) Get(collectionName string, id string) (*mongo.S
 	db := client.Database(connectionDetails.DatabaseName)
 
 	collection := db.Collection(collectionName)
-	findOne := collection.FindOne(ctx, bson.M{"id": id})
+	findOne := collection.FindOne(ctx, bson.M{"_id": id})
 
 	return findOne, nil
 }
@@ -185,7 +185,7 @@ func (connectionDetails *Client) GetCustom(collectionName string, filter interfa
 	return findOne, nil
 }
 
-// GetAll finds all documents by "id" and not "_id".
+// GetAll finds all documents by "_id".
 //
 // The 'result' parameter needs to be a pointer.
 func (connectionDetails *Client) GetAll(collectionName string, id string, result interface{}) error {
@@ -202,7 +202,7 @@ func (connectionDetails *Client) GetAll(collectionName string, id string, result
 	db := client.Database(connectionDetails.DatabaseName)
 
 	collection := db.Collection(collectionName)
-	find, err := collection.Find(ctx, bson.M{"id": id})
+	find, err := collection.Find(ctx, bson.M{"_id": id})
 	if err != nil {
 		return err
 	}

@@ -8,10 +8,10 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-var client Client
+var client *Client
 
 type data struct {
-	ID   string `bson:"id"`
+	ID   string `bson:"_id"`
 	Name string `bson:"name"`
 }
 
@@ -90,7 +90,7 @@ func TestClient_GetCustom(t *testing.T) {
 
 	// Actual test
 	var decodeData data
-	data, err := client.GetCustom("test_collection", bson.M{"id": "2"})
+	data, err := client.GetCustom("test_collection", bson.M{"_id": "2"})
 	if err != nil {
 		t.Errorf("No data found.")
 	}
@@ -135,7 +135,7 @@ func TestClient_GetAllCustom(t *testing.T) {
 
 	// Actual test
 	var result []data
-	err = client.GetAllCustom("test_collection", bson.M{"id": "1"}, &result)
+	err = client.GetAllCustom("test_collection", bson.M{"_id": "1"}, &result)
 	if err != nil {
 		t.Errorf("No data found.")
 	}
