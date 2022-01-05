@@ -16,6 +16,4 @@ go get github.com/akshaybabloo/mongo/v2
 
 ## Usage
 
-> Unlike the MongoDB driver, this library depends on `id` and NOT `_id`. That means you will have to create an index for `id` field.
-
-See `example_test.go`
+See [example_test.go](https://github.com/akshaybabloo/mongo/blob/master/example_test.go)
