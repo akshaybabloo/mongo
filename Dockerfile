@@ -1,6 +1,6 @@
-FROM mongo:5-focal
+FROM mongo:latest
 
-ARG go_version=1.17.5
+ARG go_version=1.18
 ENV PATH="/usr/local/go/bin:$PATH"
 
 ARG DEBIAN_FRONTEND=noninteractive
