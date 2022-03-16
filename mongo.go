@@ -33,7 +33,6 @@ package mongo
 
 import (
 	"context"
-	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -47,32 +46,45 @@ type Client struct {
 
 	// DatabaseName with database name
 	DatabaseName string
+
+	// Highly recommend using timeout Context
+	Context context.Context
 }
 
 // NewMongoClient returns Client and it's associated functions
-func NewMongoClient(connectionURL string, databaseName string) *Client {
+func NewMongoClient(connectionURL string, databaseName string, ctx context.Context) *Client {
 	return &Client{
 		ConnectionUrl: connectionURL,
 		DatabaseName:  databaseName,
+		Context:       ctx,
+	}
+}
+
+// NewMongoClientDefault returns Client, and it's associated functions with default context
+func NewMongoClientDefault(connectionURL string, databaseName string) *Client {
+	return &Client{
+		ConnectionUrl: connectionURL,
+		DatabaseName:  databaseName,
+		Context:       context.Background(),
 	}
 }
 
 // Add can be used to add document to MongoDB
 func (connectionDetails *Client) Add(collectionName string, data interface{}) (*mongo.InsertOneResult, error) {
-	client, ctx, err := connectionDetails.client()
+	client, err := connectionDetails.client()
 	if err != nil {
 		return nil, err
 	}
 	defer func(client *mongo.Client, ctx context.Context) {
-		err := client.Disconnect(ctx)
+		err := client.Disconnect(connectionDetails.Context)
 		if err != nil {
 			return
 		}
-	}(client, ctx)
+	}(client, connectionDetails.Context)
 	db := client.Database(connectionDetails.DatabaseName)
 
 	collection := db.Collection(collectionName)
-	insertResult, err := collection.InsertOne(ctx, data)
+	insertResult, err := collection.InsertOne(connectionDetails.Context, data)
 	if err != nil {
 		return nil, err
 	}
@@ -81,20 +93,20 @@ func (connectionDetails *Client) Add(collectionName string, data interface{}) (*
 
 // AddMany can be used to add multiple documents to MongoDB
 func (connectionDetails *Client) AddMany(collectionName string, data []interface{}) (*mongo.InsertManyResult, error) {
-	client, ctx, err := connectionDetails.client()
+	client, err := connectionDetails.client()
 	if err != nil {
 		return nil, err
 	}
 	defer func(client *mongo.Client, ctx context.Context) {
-		err := client.Disconnect(ctx)
+		err := client.Disconnect(connectionDetails.Context)
 		if err != nil {
 			return
 		}
-	}(client, ctx)
+	}(client, connectionDetails.Context)
 	db := client.Database(connectionDetails.DatabaseName)
 
 	collection := db.Collection(collectionName)
-	insertResult, err := collection.InsertMany(ctx, data)
+	insertResult, err := collection.InsertMany(connectionDetails.Context, data)
 	if err != nil {
 		return nil, err
 	}
@@ -103,20 +115,20 @@ func (connectionDetails *Client) AddMany(collectionName string, data []interface
 
 // Update can be used to update values by its ID
 func (connectionDetails *Client) Update(collectionName string, id string, data interface{}) (*mongo.UpdateResult, error) {
-	client, ctx, err := connectionDetails.client()
+	client, err := connectionDetails.client()
 	if err != nil {
 		return nil, err
 	}
 	defer func(client *mongo.Client, ctx context.Context) {
-		err := client.Disconnect(ctx)
+		err := client.Disconnect(connectionDetails.Context)
 		if err != nil {
 			return
 		}
-	}(client, ctx)
+	}(client, connectionDetails.Context)
 	db := client.Database(connectionDetails.DatabaseName)
 
 	collection := db.Collection(collectionName)
-	updateResult, err := collection.UpdateOne(ctx, bson.M{"_id": id}, bson.D{{"$set", data}})
+	updateResult, err := collection.UpdateOne(connectionDetails.Context, bson.M{"_id": id}, bson.D{{"$set", data}})
 	if err != nil {
 		return nil, err
 	}
@@ -125,20 +137,20 @@ func (connectionDetails *Client) Update(collectionName string, id string, data i
 
 // Delete deletes a document by ID only.
 func (connectionDetails *Client) Delete(collectionName string, id string) (*mongo.DeleteResult, error) {
-	client, ctx, err := connectionDetails.client()
+	client, err := connectionDetails.client()
 	if err != nil {
 		return nil, err
 	}
 	defer func(client *mongo.Client, ctx context.Context) {
-		err := client.Disconnect(ctx)
+		err := client.Disconnect(connectionDetails.Context)
 		if err != nil {
 			return
 		}
-	}(client, ctx)
+	}(client, connectionDetails.Context)
 	db := client.Database(connectionDetails.DatabaseName)
 
 	collection := db.Collection(collectionName)
-	insertResult, err := collection.DeleteOne(ctx, bson.M{"_id": id})
+	insertResult, err := collection.DeleteOne(connectionDetails.Context, bson.M{"_id": id})
 	if err != nil {
 		return nil, err
 	}
@@ -147,40 +159,40 @@ func (connectionDetails *Client) Delete(collectionName string, id string) (*mong
 
 // Get finds one document based on "_id"
 func (connectionDetails *Client) Get(collectionName string, id string) (*mongo.SingleResult, error) {
-	client, ctx, err := connectionDetails.client()
+	client, err := connectionDetails.client()
 	if err != nil {
 		return nil, err
 	}
 	defer func(client *mongo.Client, ctx context.Context) {
-		err := client.Disconnect(ctx)
+		err := client.Disconnect(connectionDetails.Context)
 		if err != nil {
 			return
 		}
-	}(client, ctx)
+	}(client, connectionDetails.Context)
 	db := client.Database(connectionDetails.DatabaseName)
 
 	collection := db.Collection(collectionName)
-	findOne := collection.FindOne(ctx, bson.M{"_id": id})
+	findOne := collection.FindOne(connectionDetails.Context, bson.M{"_id": id})
 
 	return findOne, nil
 }
 
 // GetCustom finds one document by a filter - bson.M{}, bson.A{}, or bson.D{}
 func (connectionDetails *Client) GetCustom(collectionName string, filter interface{}) (*mongo.SingleResult, error) {
-	client, ctx, err := connectionDetails.client()
+	client, err := connectionDetails.client()
 	if err != nil {
 		return nil, err
 	}
 	defer func(client *mongo.Client, ctx context.Context) {
-		err := client.Disconnect(ctx)
+		err := client.Disconnect(connectionDetails.Context)
 		if err != nil {
 			return
 		}
-	}(client, ctx)
+	}(client, connectionDetails.Context)
 	db := client.Database(connectionDetails.DatabaseName)
 
 	collection := db.Collection(collectionName)
-	findOne := collection.FindOne(ctx, filter)
+	findOne := collection.FindOne(connectionDetails.Context, filter)
 
 	return findOne, nil
 }
@@ -189,25 +201,25 @@ func (connectionDetails *Client) GetCustom(collectionName string, filter interfa
 //
 // The 'result' parameter needs to be a pointer.
 func (connectionDetails *Client) GetAll(collectionName string, id string, result interface{}) error {
-	client, ctx, err := connectionDetails.client()
+	client, err := connectionDetails.client()
 	if err != nil {
 		return err
 	}
 	defer func(client *mongo.Client, ctx context.Context) {
-		err := client.Disconnect(ctx)
+		err := client.Disconnect(connectionDetails.Context)
 		if err != nil {
 			return
 		}
-	}(client, ctx)
+	}(client, connectionDetails.Context)
 	db := client.Database(connectionDetails.DatabaseName)
 
 	collection := db.Collection(collectionName)
-	find, err := collection.Find(ctx, bson.M{"_id": id})
+	find, err := collection.Find(connectionDetails.Context, bson.M{"_id": id})
 	if err != nil {
 		return err
 	}
 
-	if err = find.All(ctx, result); err != nil {
+	if err = find.All(connectionDetails.Context, result); err != nil {
 		return err
 	}
 
@@ -218,25 +230,25 @@ func (connectionDetails *Client) GetAll(collectionName string, id string, result
 //
 // The 'result' parameter needs to be a pointer.
 func (connectionDetails *Client) GetAllCustom(collectionName string, filter interface{}, result interface{}) error {
-	client, ctx, err := connectionDetails.client()
+	client, err := connectionDetails.client()
 	if err != nil {
 		return err
 	}
 	defer func(client *mongo.Client, ctx context.Context) {
-		err := client.Disconnect(ctx)
+		err := client.Disconnect(connectionDetails.Context)
 		if err != nil {
 			return
 		}
-	}(client, ctx)
+	}(client, connectionDetails.Context)
 	db := client.Database(connectionDetails.DatabaseName)
 
 	collection := db.Collection(collectionName)
-	find, err := collection.Find(ctx, filter)
+	find, err := collection.Find(connectionDetails.Context, filter)
 	if err != nil {
 		return err
 	}
 
-	if err = find.All(ctx, result); err != nil {
+	if err = find.All(connectionDetails.Context, result); err != nil {
 		return err
 	}
 
@@ -247,45 +259,45 @@ func (connectionDetails *Client) GetAllCustom(collectionName string, filter inte
 //
 // Note: Do not forget to do - defer Client.Disconnect(ctx)
 func (connectionDetails *Client) Collection(collectionName string) (*mongo.Collection, *mongo.Client, context.Context, error) {
-	client, ctx, err := connectionDetails.client()
+	client, err := connectionDetails.client()
 	if err != nil {
 		return nil, nil, nil, err
 	}
 	db := client.Database(connectionDetails.DatabaseName)
 
 	collection := db.Collection(collectionName)
-	return collection, client, ctx, nil
+	return collection, client, connectionDetails.Context, nil
 }
 
 // DB returns mongo.Database
 func (connectionDetails *Client) DB() (*mongo.Database, error) {
-	client, ctx, err := connectionDetails.client()
+	client, err := connectionDetails.client()
 	if err != nil {
 		return nil, err
 	}
 	defer func(client *mongo.Client, ctx context.Context) {
-		err := client.Disconnect(ctx)
+		err := client.Disconnect(connectionDetails.Context)
 		if err != nil {
 			return
 		}
-	}(client, ctx)
+	}(client, connectionDetails.Context)
 	db := client.Database(connectionDetails.DatabaseName)
 
 	return db, nil
 }
 
 // RawClient returns mongo.Client
-func (connectionDetails *Client) RawClient() (*mongo.Client, context.Context, error) {
+func (connectionDetails *Client) RawClient() (*mongo.Client, error) {
 	return connectionDetails.client()
 }
 
-func (connectionDetails *Client) client() (*mongo.Client, context.Context, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer cancel()
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(connectionDetails.ConnectionUrl))
+func (connectionDetails *Client) client() (*mongo.Client, error) {
+	// connectionDetails.Context, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	// defer cancel()
+	client, err := mongo.Connect(connectionDetails.Context, options.Client().ApplyURI(connectionDetails.ConnectionUrl))
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	return client, ctx, nil
+	return client, nil
 }

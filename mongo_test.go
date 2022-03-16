@@ -16,7 +16,10 @@ type data struct {
 }
 
 func init() {
-	client = NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test")
+	client = NewMongoClient(
+		"mongodb://root:password12@localhost:27017/?retryWrites=true&w=majority",
+		"test",
+		context.Background())
 }
 
 func TestClient_Add(t *testing.T) {
@@ -77,16 +80,16 @@ func TestClient_Get(t *testing.T) {
 }
 
 func TestClient_GetCustom(t *testing.T) {
-	testData := data{
-		ID:   "2",
-		Name: "Akshay",
-	}
-
-	done, err := client.Add("test_collection", testData)
-	if err != nil {
-		t.Errorf("Unable to add data. %s", err)
-	}
-	t.Logf("The ID is %s", done.InsertedID)
+	// testData := data{
+	// 	ID:   "2",
+	// 	Name: "Akshay",
+	// }
+	//
+	// done, err := client.Add("test_collection", testData)
+	// if err != nil {
+	// 	t.Errorf("Unable to add data. %s", err)
+	// }
+	// t.Logf("The ID is %s", done.InsertedID)
 
 	// Actual test
 	var decodeData data
@@ -123,48 +126,39 @@ func TestClient_GetAll(t *testing.T) {
 }
 
 func TestClient_GetAllCustom(t *testing.T) {
-	testData := data{
-		ID:   "123",
-		Name: "Akshay",
-	}
-
-	_, err := client.Add("test_collection", testData)
-	if err != nil {
-		t.Errorf("Unable to add data. %s", err)
-	}
 
 	// Actual test
 	var result []data
-	err = client.GetAllCustom("test_collection", bson.M{"_id": "1"}, &result)
+	err := client.GetAllCustom("test_collection", bson.M{"_id": "1"}, &result)
 	if err != nil {
 		t.Errorf("No data found.")
 	}
 	t.Logf("%v", result)
 }
 
-func TestClient_Update(t *testing.T) {
-	testData := data{
-		ID:   "3",
-		Name: "Akshay",
-	}
-
-	done, err := client.Add("test_collection", testData)
-	if err != nil {
-		t.Errorf("Unable to add data. %s", err)
-	}
-	t.Logf("The ID is %s", done.InsertedID)
-
-	// Actual test
-	data := data{
-		Name: "Gollahalli",
-	}
-
-	update, err := client.Update("test_collection", "3", data)
-	if err != nil {
-		t.Errorf("Unable to update data. %s", err)
-	}
-	t.Logf("The ID is %d", update.ModifiedCount)
-}
+// func TestClient_Update(t *testing.T) {
+// 	testData := data{
+// 		ID:   "3",
+// 		Name: "Akshay",
+// 	}
+//
+// 	done, err := client.Add("test_collection", testData)
+// 	if err != nil {
+// 		t.Errorf("Unable to add data. %s", err)
+// 	}
+// 	t.Logf("The ID is %s", done.InsertedID)
+//
+// 	// Actual test
+// 	data := data{
+// 		Name: "Gollahalli",
+// 	}
+//
+// 	update, err := client.Update("test_collection", "3", data)
+// 	if err != nil {
+// 		t.Errorf("Unable to update data. %s", err)
+// 	}
+// 	t.Logf("The ID is %d", update.ModifiedCount)
+// }
 
 func TestClient_Delete(t *testing.T) {
 	testData := data{

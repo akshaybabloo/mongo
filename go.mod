@@ -1,4 +1,4 @@
-module github.com/akshaybabloo/mongo/v3
+module github.com/akshaybabloo/mongo/v4
 
 go 1.18
 
