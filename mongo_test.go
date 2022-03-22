@@ -180,6 +180,26 @@ func TestClient_Delete(t *testing.T) {
 	t.Logf("Number deleted %d", deleted.DeletedCount)
 }
 
+func TestClient_DeleteCustom(t *testing.T) {
+	testData := data{
+		ID:   "4",
+		Name: "Akshay",
+	}
+
+	done, err := client.Add("test_collection", testData)
+	if err != nil {
+		t.Errorf("Unable to add data. %s", err)
+	}
+	t.Logf("The ID is %s", done.InsertedID)
+
+	// Actual test
+	deleted, err := client.DeleteCustom("test_collection", bson.M{"_id": 4})
+	if err != nil {
+		t.Errorf("Unable to delete data. %s", err)
+	}
+	t.Logf("Number deleted %d", deleted.DeletedCount)
+}
+
 func TestClient_Collection(t *testing.T) {
 	collection, client, ctx, err := client.Collection("test_collection")
 	if err != nil {

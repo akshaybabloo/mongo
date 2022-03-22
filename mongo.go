@@ -157,6 +157,28 @@ func (connectionDetails *Client) Delete(collectionName string, id string) (*mong
 	return insertResult, nil
 }
 
+// DeleteCustom deletes a document by a filter - bson.M{}, bson.A{}, or bson.D{}
+func (connectionDetails *Client) DeleteCustom(collectionName string, filter interface{}) (*mongo.DeleteResult, error) {
+	client, err := connectionDetails.client()
+	if err != nil {
+		return nil, err
+	}
+	defer func(client *mongo.Client, ctx context.Context) {
+		err := client.Disconnect(connectionDetails.Context)
+		if err != nil {
+			return
+		}
+	}(client, connectionDetails.Context)
+	db := client.Database(connectionDetails.DatabaseName)
+
+	collection := db.Collection(collectionName)
+	insertResult, err := collection.DeleteOne(connectionDetails.Context, filter)
+	if err != nil {
+		return nil, err
+	}
+	return insertResult, nil
+}
+
 // Get finds one document based on "_id"
 func (connectionDetails *Client) Get(collectionName string, id string) (*mongo.SingleResult, error) {
 	client, err := connectionDetails.client()
