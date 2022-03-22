@@ -67,6 +67,21 @@ func ExampleClient_Delete() {
 	fmt.Println("Deleted items:", deleted.DeletedCount)
 }
 
+func ExampleClient_DeleteMany() {
+	type data struct {
+		ID   string `bson:"_id"`
+		Name string `bson:"name"`
+	}
+
+	client := mongo.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test", context.Background())
+
+	deleted, err := client.DeleteMany("test_collection", bson.M{"_id": bson.M{"$in": bson.A{"1", "2"}}})
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Deleted items:", deleted.DeletedCount)
+}
+
 func ExampleClient_Update() {
 	type data struct {
 		Name string `bson:"name"`

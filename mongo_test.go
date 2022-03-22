@@ -54,6 +54,36 @@ func TestClient_AddMany(t *testing.T) {
 	t.Logf("The ID is %s", done.InsertedIDs)
 }
 
+func TestClient_DeleteMany(t *testing.T) {
+	type data struct {
+		ID   string `bson:"_id"`
+		Name string `bson:"name"`
+	}
+
+	var testData = []interface{}{
+		data{
+			ID:   "1",
+			Name: "Akshay",
+		},
+		data{
+			ID:   "2",
+			Name: "Raj",
+		},
+	}
+
+	done, err := client.AddMany("test_collection", testData)
+	if err != nil {
+		t.Errorf("Unable to add data. %s", err)
+	}
+	t.Logf("The ID is %s", done.InsertedIDs)
+
+	deleted, err := client.DeleteMany("test_collection", bson.M{"_id": bson.M{"$in": bson.A{"1", "2"}}})
+	if err != nil {
+		t.Errorf("Unable to add data. %s", err)
+	}
+	t.Logf("Deleted items: %d", deleted.DeletedCount)
+}
+
 func TestClient_Get(t *testing.T) {
 	testData := data{
 		ID:   "2",
