@@ -1,5 +1,0 @@
-name: 'Mongo Tester'
-description: 'Runs mongo test'
-runs:
-  using: 'docker'
-  image: 'Dockerfile'
