@@ -100,6 +100,24 @@ func ExampleClient_Update() {
 	fmt.Println("Modified items:", updated.ModifiedCount)
 }
 
+func ExampleClient_UpdateCustom() {
+	type data struct {
+		Name string `bson:"name"`
+	}
+
+	client := mongo.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test", context.Background())
+
+	testData := data{
+		Name: "Akshay",
+	}
+
+	updated, err := client.UpdateCustom("test_collection", bson.M{"_id": "1"}, testData)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("Modified items:", updated.ModifiedCount)
+}
+
 func ExampleClient_Get() {
 
 	type data struct {

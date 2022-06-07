@@ -135,6 +135,28 @@ func (connectionDetails *Client) Update(collectionName string, id string, data i
 	return updateResult, nil
 }
 
+// UpdateCustom can be used to update values by a filter - bson.M{}, bson.A{}, or bson.D{}
+func (connectionDetails *Client) UpdateCustom(collectionName string, filter interface{}, data interface{}) (*mongo.UpdateResult, error) {
+	client, err := connectionDetails.client()
+	if err != nil {
+		return nil, err
+	}
+	defer func(client *mongo.Client, ctx context.Context) {
+		err := client.Disconnect(connectionDetails.Context)
+		if err != nil {
+			return
+		}
+	}(client, connectionDetails.Context)
+	db := client.Database(connectionDetails.DatabaseName)
+
+	collection := db.Collection(collectionName)
+	updateResult, err := collection.UpdateOne(connectionDetails.Context, filter, bson.D{{"$set", data}})
+	if err != nil {
+		return nil, err
+	}
+	return updateResult, nil
+}
+
 // Delete deletes a document by ID only.
 func (connectionDetails *Client) Delete(collectionName string, id string) (*mongo.DeleteResult, error) {
 	client, err := connectionDetails.client()
