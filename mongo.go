@@ -136,7 +136,7 @@ func (connectionDetails *Client) Update(collectionName string, id string, data i
 }
 
 // UpdateCustom can be used to update values by a filter - bson.M{}, bson.A{}, or bson.D{}
-func (connectionDetails *Client) UpdateCustom(collectionName string, filter interface{}, data interface{}) (*mongo.UpdateResult, error) {
+func (connectionDetails *Client) UpdateCustom(collectionName string, filter interface{}, data interface{}, updateOptions ...*options.UpdateOptions) (*mongo.UpdateResult, error) {
 	client, err := connectionDetails.client()
 	if err != nil {
 		return nil, err
@@ -150,7 +150,7 @@ func (connectionDetails *Client) UpdateCustom(collectionName string, filter inte
 	db := client.Database(connectionDetails.DatabaseName)
 
 	collection := db.Collection(collectionName)
-	updateResult, err := collection.UpdateOne(connectionDetails.Context, filter, bson.D{{"$set", data}})
+	updateResult, err := collection.UpdateOne(connectionDetails.Context, filter, bson.D{{"$set", data}}, updateOptions...)
 	if err != nil {
 		return nil, err
 	}
