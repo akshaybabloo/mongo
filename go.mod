@@ -1,6 +1,6 @@
 module github.com/akshaybabloo/mongo/v4
 
-go 1.18
+go 1.20
 
 require go.mongodb.org/mongo-driver v1.11.6
 
