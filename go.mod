@@ -2,7 +2,7 @@ module github.com/akshaybabloo/mongo/v4
 
 go 1.20
 
-require go.mongodb.org/mongo-driver v1.15.0
+require go.mongodb.org/mongo-driver v1.15.1
 
 require (
 	github.com/golang/snappy v0.0.1 // indirect
