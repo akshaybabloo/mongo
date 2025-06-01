@@ -1,12 +1,12 @@
-package mongo_test
+package mongodb_test
 
 import (
 	"context"
 	"fmt"
 
-	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/v2/bson"
 
-	"github.com/akshaybabloo/mongo/v4"
+	"github.com/akshaybabloo/mongodb/v5"
 )
 
 func ExampleClient_Add() {
@@ -16,7 +16,7 @@ func ExampleClient_Add() {
 		Name string `bson:"name"`
 	}
 
-	client := mongo.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test", context.Background())
+	client := mongodb.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test", context.Background())
 
 	testData := data{
 		ID:   "1",
@@ -37,7 +37,7 @@ func ExampleClient_AddMany() {
 		Name string `bson:"name"`
 	}
 
-	client := mongo.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test", context.Background())
+	client := mongodb.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test", context.Background())
 
 	var testData = []interface{}{
 		data{
@@ -58,7 +58,7 @@ func ExampleClient_AddMany() {
 }
 
 func ExampleClient_Delete() {
-	client := mongo.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test", context.Background())
+	client := mongodb.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test", context.Background())
 
 	deleted, err := client.Delete("test_collection", "1")
 	if err != nil {
@@ -68,12 +68,7 @@ func ExampleClient_Delete() {
 }
 
 func ExampleClient_DeleteMany() {
-	type data struct {
-		ID   string `bson:"_id"`
-		Name string `bson:"name"`
-	}
-
-	client := mongo.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test", context.Background())
+	client := mongodb.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test", context.Background())
 
 	deleted, err := client.DeleteMany("test_collection", bson.M{"_id": bson.M{"$in": bson.A{"1", "2"}}})
 	if err != nil {
@@ -87,7 +82,7 @@ func ExampleClient_Update() {
 		Name string `bson:"name"`
 	}
 
-	client := mongo.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test", context.Background())
+	client := mongodb.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test", context.Background())
 
 	testData := data{
 		Name: "Akshay",
@@ -105,7 +100,7 @@ func ExampleClient_UpdateCustom() {
 		Name string `bson:"name"`
 	}
 
-	client := mongo.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test", context.Background())
+	client := mongodb.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test", context.Background())
 
 	testData := data{
 		Name: "Akshay",
@@ -125,7 +120,7 @@ func ExampleClient_Get() {
 		Name string `bson:"name"`
 	}
 
-	client := mongo.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test", context.Background())
+	client := mongodb.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test", context.Background())
 
 	var decodeData data
 	get, err := client.Get("test_collection", "2")
@@ -146,7 +141,7 @@ func ExampleClient_GetCustom() {
 		Name string `bson:"name"`
 	}
 
-	client := mongo.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test", context.Background())
+	client := mongodb.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test", context.Background())
 
 	var decodeData data
 	getCustom, err := client.GetCustom("test_collection", bson.M{"_id": "2"})
@@ -167,7 +162,7 @@ func ExampleClient_GetAll() {
 		Name string `bson:"name"`
 	}
 
-	client := mongo.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test", context.Background())
+	client := mongodb.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test", context.Background())
 
 	var testData []data
 	err := client.GetAll("test_collection", "1", &data{})
@@ -184,7 +179,7 @@ func ExampleClient_GetAllCustom() {
 		Name string `bson:"name"`
 	}
 
-	client := mongo.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test", context.Background())
+	client := mongodb.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test", context.Background())
 
 	var testData []data
 	err := client.GetAllCustom("test_collection", bson.M{"_id": "1"}, &data{})

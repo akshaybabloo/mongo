@@ -1,11 +1,11 @@
-package mongo
+package mongodb
 
 import (
 	"context"
 	"testing"
 
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/v2/bson"
+	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
 var client *Client
@@ -126,6 +126,7 @@ func TestClient_GetCustom(t *testing.T) {
 	data, err := client.GetCustom("test_collection", bson.M{"_id": "2"})
 	if err != nil {
 		t.Errorf("No data found.")
+		return
 	}
 	err = data.Decode(&decodeData)
 	if err != nil {
