@@ -6,29 +6,27 @@
 //
 // Example:
 //
-// 	import "github.com/akshaybabloo/mongo"
+//	import "github.com/akshaybabloo/mongo"
 //
-// 	type data struct {
-// 		ID   int    `bson:"_id"`
-// 		Name string `bson:"name"`
-// 	}
+//	type data struct {
+//		ID   int    `bson:"_id"`
+//		Name string `bson:"name"`
+//	}
 //
-// 	func main() {
-// 		client := NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test")
+//	func main() {
+//		client := NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test")
 //
-// 		testData := data{
-// 			ID:   1,
-// 			Name: "Akshay",
-// 		}
+//		testData := data{
+//			ID:   1,
+//			Name: "Akshay",
+//		}
 //
-// 		done, err := client.Add("test_collection", testData)
-// 		if err != nil {
-// 			panic(err)
-// 		}
-// 		print(done.InsertedID)
-// 	}
-//
-//
+//		done, err := client.Add("test_collection", testData)
+//		if err != nil {
+//			panic(err)
+//		}
+//		print(done.InsertedID)
+//	}
 package mongo
 
 import (
@@ -366,4 +364,25 @@ func (connectionDetails *Client) client() (*mongo.Client, error) {
 	}
 
 	return client, nil
+}
+
+func (c *Client) DeleteDatabase() error {
+	client, err := c.client()
+	if err != nil {
+		return err
+	}
+	defer func(client *mongo.Client, ctx context.Context) {
+		err := client.Disconnect(c.Context)
+		if err != nil {
+			return
+		}
+	}(client, c.Context)
+	db := client.Database(c.DatabaseName)
+	err = db.Drop(c.Context)
+	if err != nil {
+		return err
+	}
+
+	return nil
+
 }

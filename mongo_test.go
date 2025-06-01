@@ -17,14 +17,14 @@ type data struct {
 
 func init() {
 	client = NewMongoClient(
-		"mongodb://root:password12@localhost:27017/?retryWrites=true&w=majority",
+		"mongodb://root:example@localhost:27017/?retryWrites=true&w=majority",
 		"test",
 		context.Background())
 }
 
 func TestClient_Add(t *testing.T) {
 	testData := data{
-		ID:   "1",
+		ID:   "1231",
 		Name: "Akshay",
 	}
 
@@ -251,4 +251,12 @@ func TestClient_DB(t *testing.T) {
 	if db.Name() != "test" {
 		t.Errorf("Database name incorrect")
 	}
+}
+
+func TestClient_DeleteDatabase(t *testing.T) {
+	err := client.DeleteDatabase()
+	if err != nil {
+		t.Errorf("Unable to delete database. %s", err)
+	}
+	t.Logf("Database deleted successfully")
 }
