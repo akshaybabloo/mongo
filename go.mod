@@ -1,4 +1,4 @@
-module github.com/akshaybabloo/mongodb/v5
+module github.com/akshaybabloo/mongodb/v6
 
 go 1.24
 

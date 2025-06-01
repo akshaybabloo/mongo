@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
-	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
 var client *Client
@@ -16,10 +15,13 @@ type data struct {
 }
 
 func init() {
-	client = NewMongoClient(
+	var err error
+	client, err = NewMongoClient(
 		"mongodb://root:example@localhost:27017/?retryWrites=true&w=majority",
-		"test",
-		context.Background())
+		"test")
+	if err != nil {
+		panic(err)
+	}
 }
 
 func TestClient_Add(t *testing.T) {
@@ -27,9 +29,10 @@ func TestClient_Add(t *testing.T) {
 		ID:   "1231",
 		Name: "Akshay",
 	}
-
-	done, err := client.Add("test_collection", testData)
+	ctx := context.Background()
+	done, err := client.Add(ctx, "test_collection", testData)
 	if err != nil {
+		client.Close()
 		t.Errorf("Unable to add data. %s", err)
 	}
 	t.Logf("The ID is %s", done.InsertedID)
@@ -47,8 +50,10 @@ func TestClient_AddMany(t *testing.T) {
 		},
 	}
 
-	done, err := client.AddMany("test_collection", testData)
+	ctx := context.Background()
+	done, err := client.AddMany(ctx, "test_collection", testData)
 	if err != nil {
+		client.Close()
 		t.Errorf("Unable to add data. %s", err)
 	}
 	t.Logf("The ID is %s", done.InsertedIDs)
@@ -70,15 +75,18 @@ func TestClient_DeleteMany(t *testing.T) {
 			Name: "Raj",
 		},
 	}
-
-	done, err := client.AddMany("test_collection", testData)
+	ctx := context.Background()
+	done, err := client.AddMany(ctx, "test_collection", testData)
 	if err != nil {
+		client.Close()
 		t.Errorf("Unable to add data. %s", err)
 	}
 	t.Logf("The ID is %s", done.InsertedIDs)
 
-	deleted, err := client.DeleteMany("test_collection", bson.M{"_id": bson.M{"$in": bson.A{"1", "2"}}})
+	ctx = context.Background()
+	deleted, err := client.DeleteMany(ctx, "test_collection", bson.M{"_id": bson.M{"$in": bson.A{"1", "2"}}})
 	if err != nil {
+		client.Close()
 		t.Errorf("Unable to add data. %s", err)
 	}
 	t.Logf("Deleted items: %d", deleted.DeletedCount)
@@ -90,20 +98,25 @@ func TestClient_Get(t *testing.T) {
 		Name: "Akshay",
 	}
 
-	done, err := client.Add("test_collection", testData)
+	ctx := context.Background()
+	done, err := client.Add(ctx, "test_collection", testData)
 	if err != nil {
+		client.Close()
 		t.Errorf("Unable to add data. %s", err)
 	}
 	t.Logf("The ID is %s", done.InsertedID)
 
 	// Actual test
 	var decodeData data
-	data, err := client.Get("test_collection", "2")
+	ctx = context.Background()
+	data, err := client.Get(ctx, "test_collection", "2")
 	if err != nil {
-		panic("data not found")
+		client.Close()
+		t.Errorf("No data found.")
 	}
 	err = data.Decode(&decodeData)
 	if err != nil {
+		client.Close()
 		t.Errorf("No data found.")
 	}
 	t.Logf("%v", decodeData)
@@ -123,13 +136,16 @@ func TestClient_GetCustom(t *testing.T) {
 
 	// Actual test
 	var decodeData data
-	data, err := client.GetCustom("test_collection", bson.M{"_id": "2"})
+	ctx := context.Background()
+	data, err := client.GetCustom(ctx, "test_collection", bson.M{"_id": "2"})
 	if err != nil {
+		client.Close()
 		t.Errorf("No data found.")
 		return
 	}
 	err = data.Decode(&decodeData)
 	if err != nil {
+		client.Close()
 		t.Errorf("No data found.")
 	}
 	t.Logf("%v", decodeData)
@@ -141,31 +157,35 @@ func TestClient_GetAll(t *testing.T) {
 		ID:   "123",
 		Name: "Akshay",
 	}
-
-	_, err := client.Add("test_collection", testData)
+	ctx := context.Background()
+	_, err := client.Add(ctx, "test_collection", testData)
 	if err != nil {
+		client.Close()
 		t.Errorf("Unable to add data. %s", err)
 	}
 
 	// Actual test
 	var result []data
-	err = client.GetAll("test_collection", "1", &result)
+	ctx = context.Background()
+	err = client.FindAll(ctx, "test_collection", bson.M{"_id": "1"}, &result)
 	if err != nil {
+		client.Close()
 		t.Errorf("No data found.")
 	}
 	t.Logf("%v", result)
 }
 
-func TestClient_GetAllCustom(t *testing.T) {
-
-	// Actual test
-	var result []data
-	err := client.GetAllCustom("test_collection", bson.M{"_id": "1"}, &result)
-	if err != nil {
-		t.Errorf("No data found.")
-	}
-	t.Logf("%v", result)
-}
+// func TestClient_GetAllCustom(t *testing.T) {
+//
+// 	// Actual test
+// 	var result []data
+// 	err := client.GetAllCustom("test_collection", bson.M{"_id": "1"}, &result)
+// 	if err != nil {
+// 		client.Close()
+// 		t.Errorf("No data found.")
+// 	}
+// 	t.Logf("%v", result)
+// }
 
 // func TestClient_Update(t *testing.T) {
 // 	testData := data{
@@ -196,16 +216,19 @@ func TestClient_Delete(t *testing.T) {
 		ID:   "4",
 		Name: "Akshay",
 	}
-
-	done, err := client.Add("test_collection", testData)
+	ctx := context.Background()
+	done, err := client.Add(ctx, "test_collection", testData)
 	if err != nil {
+		client.Close()
 		t.Errorf("Unable to add data. %s", err)
 	}
 	t.Logf("The ID is %s", done.InsertedID)
 
 	// Actual test
-	deleted, err := client.Delete("test_collection", "4")
+	ctx = context.Background()
+	deleted, err := client.Delete(ctx, "test_collection", "4")
 	if err != nil {
+		client.Close()
 		t.Errorf("Unable to delete data. %s", err)
 	}
 	t.Logf("Number deleted %d", deleted.DeletedCount)
@@ -216,48 +239,56 @@ func TestClient_DeleteCustom(t *testing.T) {
 		ID:   "4",
 		Name: "Akshay",
 	}
-
-	done, err := client.Add("test_collection", testData)
+	ctx := context.Background()
+	done, err := client.Add(ctx, "test_collection", testData)
 	if err != nil {
+		client.Close()
 		t.Errorf("Unable to add data. %s", err)
 	}
 	t.Logf("The ID is %s", done.InsertedID)
 
 	// Actual test
-	deleted, err := client.DeleteCustom("test_collection", bson.M{"_id": 4})
+	ctx = context.Background()
+	deleted, err := client.DeleteCustom(ctx, "test_collection", bson.M{"_id": 4})
 	if err != nil {
+		client.Close()
 		t.Errorf("Unable to delete data. %s", err)
 	}
 	t.Logf("Number deleted %d", deleted.DeletedCount)
 }
 
 func TestClient_Collection(t *testing.T) {
-	collection, client, ctx, err := client.Collection("test_collection")
+	collection, err := client.Collection("test_collection")
 	if err != nil {
+		client.Close()
 		t.Errorf("something went wrong. %s", err)
 	}
-	defer func(client *mongo.Client, ctx context.Context) {
-		err := client.Disconnect(ctx)
-		if err != nil {
-			return
-		}
-	}(client, ctx)
 	if collection.Name() != "test_collection" {
+		client.Close()
 		t.Errorf("Collection name incorrect")
 	}
 }
 
 func TestClient_DB(t *testing.T) {
-	db, _ := client.DB()
+	db, _ := client.Database()
 	if db.Name() != "test" {
+		client.Close()
 		t.Errorf("Database name incorrect")
 	}
 }
 
 func TestClient_DeleteDatabase(t *testing.T) {
-	err := client.DeleteDatabase()
+	ctx := context.Background()
+	err := client.DropDatabase(ctx)
 	if err != nil {
+		client.Close()
 		t.Errorf("Unable to delete database. %s", err)
 	}
 	t.Logf("Database deleted successfully")
+	err = client.Close()
+	if err != nil {
+		t.Errorf("Unable to close client. %s", err)
+	} else {
+		t.Logf("Client closed successfully")
+	}
 }
