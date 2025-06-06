@@ -32,7 +32,11 @@ jobs:
         name: Setup Go
 
       - name: Test code
-        run: go test -v ./...
+        run: go test -v -race -covermode=atomic -coverprofile=coverage.out ./...
         env:
           MONGO_INITDB_ROOT_USERNAME: root
           MONGO_INITDB_ROOT_PASSWORD: example
+      - uses: codecov/codecov-action@v5
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.out
