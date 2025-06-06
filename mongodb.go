@@ -7,7 +7,7 @@
 //
 // Example:
 //
-//	import "github.com/akshaybabloo/mongodb/improved"
+//	import "github.com/akshaybabloo/mongodb/v6"
 //
 //	type data struct {
 //		ID   int    `bson:"_id"`
@@ -15,7 +15,7 @@
 //	}
 //
 //	func main() {
-//		client, err := improved.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test")
+//		client, err := mongodb.NewMongoClient("mongodb://localhost:27017/?retryWrites=true&w=majority", "test")
 //		if err != nil {
 //			panic(err)
 //		}
