@@ -59,6 +59,35 @@ func TestClient_AddMany(t *testing.T) {
 	t.Logf("The ID is %s", done.InsertedIDs)
 }
 
+func TestClient_Exists(t *testing.T) {
+	testData := data{
+		ID:   "1233455",
+		Name: "Akshay",
+	}
+	ctx := context.Background()
+	done, err := client.Add(ctx, "test_collection", testData)
+	if err != nil {
+		client.Close()
+		t.Errorf("Unable to add data. %s", err)
+	}
+	t.Logf("The ID is %s", done.InsertedID)
+
+	// Actual test
+	exists, err := client.Exists(ctx, "test_collection", "1233455")
+	if err != nil {
+		client.Close()
+		t.Errorf("Unable to check existence. %s", err)
+	}
+	t.Logf("Exists: %v", exists)
+
+	existsCustom, err := client.ExistsCustom(ctx, "test_collection", bson.M{"_id": "1233455"})
+	if err != nil {
+		client.Close()
+		t.Errorf("Unable to check existence with custom query. %s", err)
+	}
+	t.Logf("Exists with custom query: %v", existsCustom)
+}
+
 func TestClient_DeleteMany(t *testing.T) {
 	type data struct {
 		ID   string `bson:"_id"`

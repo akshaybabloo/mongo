@@ -370,6 +370,44 @@ func (c *Client) FindAll(ctx context.Context, collectionName string, filter inte
 	return cursor.All(ctx, result)
 }
 
+// Exists checks if a document exists by ID
+func (c *Client) Exists(ctx context.Context, collectionName string, id string) (bool, error) {
+	if id == "" {
+		return false, errors.New("id cannot be empty")
+	}
+
+	collection, err := c.getCollection(collectionName)
+	if err != nil {
+		return false, err
+	}
+
+	count, err := collection.CountDocuments(ctx, bson.M{"_id": id})
+	if err != nil {
+		return false, err
+	}
+
+	return count > 0, nil
+}
+
+// ExistsCustom checks if a document exists using a custom filter
+func (c *Client) ExistsCustom(ctx context.Context, collectionName string, filter interface{}) (bool, error) {
+	if filter == nil {
+		return false, errors.New("filter cannot be nil")
+	}
+
+	collection, err := c.getCollection(collectionName)
+	if err != nil {
+		return false, err
+	}
+
+	count, err := collection.CountDocuments(ctx, filter)
+	if err != nil {
+		return false, err
+	}
+
+	return count > 0, nil
+}
+
 // Collection returns a MongoDB collection
 // Note: The client connection is managed internally, no need to manually disconnect
 func (c *Client) Collection(collectionName string) (*mongo.Collection, error) {
