@@ -204,41 +204,109 @@ func TestClient_GetAll(t *testing.T) {
 	t.Logf("%v", result)
 }
 
-// func TestClient_GetAllCustom(t *testing.T) {
-//
-// 	// Actual test
-// 	var result []data
-// 	err := client.GetAllCustom("test_collection", bson.M{"_id": "1"}, &result)
-// 	if err != nil {
-// 		client.Close()
-// 		t.Errorf("No data found.")
-// 	}
-// 	t.Logf("%v", result)
-// }
+func TestClient_Update(t *testing.T) {
+	testData := data{
+		ID:   "update-id-1",
+		Name: "OriginalName",
+	}
+	ctx := context.Background()
+	_, err := client.Add(ctx, "test_collection", testData)
+	if err != nil {
+		t.Fatalf("Unable to add data: %s", err)
+	}
 
-// func TestClient_Update(t *testing.T) {
-// 	testData := data{
-// 		ID:   "3",
-// 		Name: "Akshay",
-// 	}
-//
-// 	done, err := client.Add("test_collection", testData)
-// 	if err != nil {
-// 		t.Errorf("Unable to add data. %s", err)
-// 	}
-// 	t.Logf("The ID is %s", done.InsertedID)
-//
-// 	// Actual test
-// 	data := data{
-// 		Name: "Gollahalli",
-// 	}
-//
-// 	update, err := client.Update("test_collection", "3", data)
-// 	if err != nil {
-// 		t.Errorf("Unable to update data. %s", err)
-// 	}
-// 	t.Logf("The ID is %d", update.ModifiedCount)
-// }
+	// Update only the Name field (not the whole struct)
+	updateData := bson.M{"name": "UpdatedName"}
+	updateResult, err := client.Update(ctx, "test_collection", "update-id-1", updateData)
+	if err != nil {
+		t.Fatalf("Unable to update data: %s", err)
+	}
+	if updateResult.ModifiedCount != 1 {
+		t.Errorf("Expected 1 document to be updated, got %d", updateResult.ModifiedCount)
+	}
+
+	// Verify update
+	var got data
+	res, err := client.Get(ctx, "test_collection", "update-id-1")
+	if err != nil {
+		t.Fatalf("Unable to get data: %s", err)
+	}
+	err = res.Decode(&got)
+	if err != nil {
+		t.Fatalf("Unable to decode data: %s", err)
+	}
+	if got.Name != "UpdatedName" {
+		t.Errorf("Expected Name to be 'UpdatedName', got '%s'", got.Name)
+	}
+}
+
+func TestClient_UpdateCustom(t *testing.T) {
+	testData := data{
+		ID:   "updatecustom-id-1",
+		Name: "OriginalName",
+	}
+	ctx := context.Background()
+	_, err := client.Add(ctx, "test_collection", testData)
+	if err != nil {
+		t.Fatalf("Unable to add data: %s", err)
+	}
+
+	updateData := bson.M{"name": "CustomUpdatedName"}
+	updateResult, err := client.UpdateCustom(ctx, "test_collection", bson.M{"_id": "updatecustom-id-1"}, updateData)
+	if err != nil {
+		t.Fatalf("Unable to update data: %s", err)
+	}
+	if updateResult.ModifiedCount != 1 {
+		t.Errorf("Expected 1 document to be updated, got %d", updateResult.ModifiedCount)
+	}
+
+	// Verify update
+	var got data
+	res, err := client.Get(ctx, "test_collection", "updatecustom-id-1")
+	if err != nil {
+		t.Fatalf("Unable to get data: %s", err)
+	}
+	err = res.Decode(&got)
+	if err != nil {
+		t.Fatalf("Unable to decode data: %s", err)
+	}
+	if got.Name != "CustomUpdatedName" {
+		t.Errorf("Expected Name to be 'CustomUpdatedName', got '%s'", got.Name)
+	}
+}
+
+func TestClient_UpdateMany(t *testing.T) {
+	testData := []interface{}{
+		data{ID: "updatemany-id-1", Name: "Name1"},
+		data{ID: "updatemany-id-2", Name: "Name2"},
+	}
+	ctx := context.Background()
+	_, err := client.AddMany(ctx, "test_collection", testData)
+	if err != nil {
+		t.Fatalf("Unable to add data: %s", err)
+	}
+
+	updateData := bson.M{"name": "BulkUpdated"}
+	updateResult, err := client.UpdateMany(ctx, "test_collection", bson.M{"_id": bson.M{"$in": []string{"updatemany-id-1", "updatemany-id-2"}}}, updateData)
+	if err != nil {
+		t.Fatalf("Unable to update many: %s", err)
+	}
+	if updateResult.ModifiedCount != 2 {
+		t.Errorf("Expected 2 documents to be updated, got %d", updateResult.ModifiedCount)
+	}
+
+	// Verify updates
+	var results []data
+	err = client.FindAll(ctx, "test_collection", bson.M{"_id": bson.M{"$in": []string{"updatemany-id-1", "updatemany-id-2"}}}, &results)
+	if err != nil {
+		t.Fatalf("Unable to find updated documents: %s", err)
+	}
+	for _, d := range results {
+		if d.Name != "BulkUpdated" {
+			t.Errorf("Expected Name to be 'BulkUpdated', got '%s' for ID '%s'", d.Name, d.ID)
+		}
+	}
+}
 
 func TestClient_Delete(t *testing.T) {
 	testData := data{
@@ -304,6 +372,88 @@ func TestClient_DB(t *testing.T) {
 		client.Close()
 		t.Errorf("Database name incorrect")
 	}
+}
+
+func TestClient_FindByID(t *testing.T) {
+	// Add a single test document
+	testData := data{ID: "findbyid-test-unique", Name: "TestData"}
+	ctx := context.Background()
+	_, err := client.Add(ctx, "test_collection", testData)
+	if err != nil {
+		t.Fatalf("Unable to add test data: %s", err)
+	}
+
+	// Test FindByID - should find the single document
+	var results []data
+	err = client.FindByID(ctx, "test_collection", "findbyid-test-unique", &results)
+	if err != nil {
+		t.Fatalf("Unable to find by ID: %s", err)
+	}
+
+	if len(results) != 1 {
+		t.Errorf("Expected 1 document, got %d", len(results))
+	}
+
+	if len(results) > 0 {
+		if results[0].ID != "findbyid-test-unique" {
+			t.Errorf("Expected ID 'findbyid-test-unique', got '%s'", results[0].ID)
+		}
+		if results[0].Name != "TestData" {
+			t.Errorf("Expected Name 'TestData', got '%s'", results[0].Name)
+		}
+	}
+
+	// Test with non-existent ID
+	var emptyResults []data
+	err = client.FindByID(ctx, "test_collection", "non-existent-id", &emptyResults)
+	if err != nil {
+		t.Fatalf("FindByID should not error for non-existent ID: %s", err)
+	}
+	if len(emptyResults) != 0 {
+		t.Errorf("Expected 0 documents for non-existent ID, got %d", len(emptyResults))
+	}
+}
+
+func TestClient_Ping(t *testing.T) {
+	ctx := context.Background()
+	err := client.Ping(ctx)
+	if err != nil {
+		t.Fatalf("Ping failed: %s", err)
+	}
+	t.Logf("Ping successful")
+}
+
+func TestClient_IsConnected(t *testing.T) {
+	// Test that client is connected
+	connected := client.IsConnected()
+	if !connected {
+		t.Errorf("Expected client to be connected, but it's not")
+	}
+	t.Logf("Client connection status: %v", connected)
+
+	// Test after closing and reconnecting
+	err := client.Close()
+	if err != nil {
+		t.Fatalf("Unable to close client: %s", err)
+	}
+
+	connected = client.IsConnected()
+	if connected {
+		t.Errorf("Expected client to be disconnected after Close(), but it's still connected")
+	}
+
+	// Reconnect by performing an operation (this will trigger reconnection)
+	ctx := context.Background()
+	err = client.Ping(ctx)
+	if err != nil {
+		t.Fatalf("Unable to reconnect: %s", err)
+	}
+
+	connected = client.IsConnected()
+	if !connected {
+		t.Errorf("Expected client to be connected after Ping(), but it's not")
+	}
+	t.Logf("Client reconnected successfully")
 }
 
 func TestClient_DeleteDatabase(t *testing.T) {
