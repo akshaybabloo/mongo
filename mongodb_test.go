@@ -471,3 +471,59 @@ func TestClient_DeleteDatabase(t *testing.T) {
 		t.Logf("Client closed successfully")
 	}
 }
+
+func TestClient_Aggregate(t *testing.T) {
+	// Insert sample data
+	testData := []interface{}{
+		data{ID: "agg-1", Name: "Alice"},
+		data{ID: "agg-2", Name: "Bob"},
+		data{ID: "agg-3", Name: "Alice"},
+	}
+	ctx := context.Background()
+	_, err := client.AddMany(ctx, "test_collection", testData)
+	if err != nil {
+		t.Fatalf("Unable to add data for aggregation: %s", err)
+	}
+
+	// Aggregation pipeline: group by name and count
+	pipeline := bson.A{
+		bson.M{"$group": bson.M{"_id": "$name", "count": bson.M{"$sum": 1}}},
+	}
+
+	type aggResult struct {
+		ID    string `bson:"_id"`
+		Count int32  `bson:"count"`
+	}
+	var results []aggResult
+
+	err = client.Aggregate(ctx, "test_collection", pipeline, &results)
+	if err != nil {
+		t.Fatalf("Aggregate failed: %s", err)
+	}
+
+	// Check that both "Alice" and "Bob" are present with correct counts
+	foundAlice, foundBob := false, false
+	for _, r := range results {
+		if r.ID == "Alice" && r.Count == 2 {
+			foundAlice = true
+		}
+		if r.ID == "Bob" && r.Count == 1 {
+			foundBob = true
+		}
+	}
+	if !foundAlice || !foundBob {
+		t.Errorf("Aggregate results incorrect: %+v", results)
+	}
+
+	// Test error on nil pipeline
+	err = client.Aggregate(ctx, "test_collection", nil, &results)
+	if err == nil {
+		t.Errorf("Expected error for nil pipeline, got nil")
+	}
+
+	// Test error on nil result
+	err = client.Aggregate(ctx, "test_collection", pipeline, nil)
+	if err == nil {
+		t.Errorf("Expected error for nil result, got nil")
+	}
+}

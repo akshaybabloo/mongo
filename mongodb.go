@@ -408,6 +408,29 @@ func (c *Client) ExistsCustom(ctx context.Context, collectionName string, filter
 	return count > 0, nil
 }
 
+// Aggregate performs an aggregation operation on a collection
+func (c *Client) Aggregate(ctx context.Context, collectionName string, pipeline interface{}, result interface{}, aggregateOptions ...options.Lister[options.AggregateOptions]) error {
+	if pipeline == nil {
+		return errors.New("pipeline cannot be nil")
+	}
+	if result == nil {
+		return errors.New("result cannot be nil")
+	}
+
+	collection, err := c.getCollection(collectionName)
+	if err != nil {
+		return err
+	}
+
+	cursor, err := collection.Aggregate(ctx, pipeline, aggregateOptions...)
+	if err != nil {
+		return err
+	}
+	defer cursor.Close(ctx)
+
+	return cursor.All(ctx, result)
+}
+
 // Collection returns a MongoDB collection
 // Note: The client connection is managed internally, no need to manually disconnect
 func (c *Client) Collection(collectionName string) (*mongo.Collection, error) {
